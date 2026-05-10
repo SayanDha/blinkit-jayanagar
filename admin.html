@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Panel</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #f5f5f5;
+      max-width: 750px;
+      margin: auto;
+    }
+
+    h1 { color: #111; }
+
+    select {
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 6px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-update { background: #1565c0; }
+    .btn-delete { background: #c62828; }
+
+    .btn:hover {
+      opacity: 0.85;
+    }
+
+    .card {
+      background: white;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .product-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .product-info {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .product-info img {
+      width: 55px;
+      height: 55px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .badge-ok {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .badge-low {
+      background: #fff8e1;
+      color: #e65100;
+    }
+
+    .badge-out {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .stock-input {
+      width: 75px;
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .order-card {
+      border-left: 4px solid #1565c0;
+    }
+
+    .order-status {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-left: 6px;
+    }
+
+    .status-placed {
+      background: #e3f2fd;
+      color: #0d47a1;
+    }
+
+    .status-preparing {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .status-out {
+      background: #f3e5f5;
+      color: #6a1b9a;
+    }
+
+    .status-delivered {
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    .status-cancelled {
+      background: #ffebee;
+      color: #b71c1c;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 28px 0 10px;
+      color: #111;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 6px;
+    }
+
+    .error-box {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    #toast {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 999;
+      color: white;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    #toast.show {
+      display: block;
+    }
+
+    #toast.success {
+      background: #2e7d32;
+    }
+
+    #toast.error {
+      background: #c62828;
+    }
+
+    #toast.info {
+      background: #333;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<h1>🛠 Admin Panel</h1>
+
+<label><b>Shop: </b></label>
+
+<select id="shopSelect" onchange="loadProducts()">
+  <option value="">-- Loading shops... --</option>
+</select>
+
+<div class="section-title">Add Product</div>
+
+<div class="card">
+
+  <input
+    type="text"
+    id="newProductName"
+    class="form-input"
+    placeholder="Product Name"
+  >
+
+  <input
+    type="number"
+    id="newProductPrice"
+    class="form-input"
+    placeholder="Product Price"
+  >
+
+  <input
+    type="number"
+    id="newProductStock"
+    class="form-input"
+    placeholder="Product Stock"
+  >
+
+  <input
+    type="text"
+    id="newProductImage"
+    class="form-input"
+    placeholder="Product Image URL"
+  >
+
+  <button
+    class="btn btn-update"
+    onclick="addProduct()"
+  >
+    Add Product
+  </button>
+
+</div>
+
+<div class="section-title">Products</div>
+
+<div id="productList">
+  <p style="color:#888">Waiting for shop selection...</p>
+</div>
+
+<div class="section-title">Orders (real-time)</div>
+
+<div id="orderList">
+  <p style="color:#888">Loading orders...</p>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+  orderBy,
+  updateDoc,
+  deleteDoc,
+  doc,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBEgVRjqj5SshWvkUsM2pPbPs6dMP77wAw",
+  authDomain: "jayanagar-delivery.firebaseapp.com",
+  projectId: "jayanagar-delivery",
+  storageBucket: "jayanagar-delivery.firebasestorage.app",
+  messagingSenderId: "460592006643",
+  appId: "1:460592006643:web:998daeb371e9e342043e86",
+  measurementId: "G-7L7T72ENL1"
+};
+
+let app, db;
+
+try {
+
+  app = initializeApp(firebaseConfig);
+
+  db = getFirestore(app);
+
+} catch (e) {
+
+  document.body.innerHTML =
+    `<h2 style="color:red">
+      Firebase init failed: ${e.message}
+    </h2>`;
+
+  throw e;
+}
+
+let unsubProducts = null;
+
+function showToast(msg, type = "info") {
+
+  const t = document.getElementById("toast");
+
+  t.textContent = msg;
+
+  t.className = "show " + type;
+
+  clearTimeout(t._timer);
+
+  t._timer = setTimeout(() => {
+    t.className = "";
+  }, 3000);
+}
+
+async function loadShops() {
+
+  const sel = document.getElementById("shopSelect");
+
+  try {
+
+    const snap = await getDocs(collection(db, "shops"));
+
+    if (snap.empty) {
+
+      sel.innerHTML =
+        '<option value="">No shops found</option>';
+
+      return;
+    }
+
+    sel.innerHTML = "";
+
+    snap.forEach(d => {
+
+      const opt = document.createElement("option");
+
+      opt.value = d.id;
+
+      opt.textContent = d.data().name || d.id;
+
+      sel.appendChild(opt);
+    });
+
+    loadProducts();
+
+    loadOrders();
+
+  } catch (e) {
+
+    console.error(e);
+
+    sel.innerHTML =
+      '<option value="">Error loading shops</option>';
+  }
+}
+
+window.addProduct = async () => {
+
+  const shopId =
+    document.getElementById("shopSelect").value;
+
+  const name =
+    document.getElementById("newProductName").value.trim();
+
+  const price =
+    parseFloat(
+      document.getElementById("newProductPrice").value
+    );
+
+  const stock =
+    parseInt(
+      document.getElementById("newProductStock").value
+    );
+
+  const image =
+    document.getElementById("newProductImage").value.trim();
+
+  if (!shopId) {
+
+    showToast("Please select a shop", "error");
+
+    return;
+  }
+
+  if (!name || isNaN(price) || isNaN(stock)) {
+
+    showToast("Fill all fields correctly", "error");
+
+    return;
+  }
+
+  try {
+
+    await addDoc(collection(db, "products"), {
+
+      name,
+      price,
+      stock,
+      image,
+      shopId
+
+    });
+
+    showToast("Product added successfully", "success");
+
+    document.getElementById("newProductName").value = "";
+    document.getElementById("newProductPrice").value = "";
+    document.getElementById("newProductStock").value = "";
+    document.getElementById("newProductImage").value = "";
+
+  } catch (e) {
+
+    console.error(e);
+
+    showToast("Failed: " + e.message, "error");
+  }
+};
+
+window.loadProducts = function () {
+
+  const shopId =
+    document.getElementById("shopSelect").value;
+
+  const list =
+    document.getElementById("productList");
+
+  if (!shopId) {
+
+    list.innerHTML =
+      "<p style='color:#888'>Select a shop.</p>";
+
+    return;
+  }
+
+  if (unsubProducts) {
+
+    unsubProducts();
+
+    unsubProducts = null;
+  }
+
+  list.innerHTML =
+    "<p style='color:#888'>Loading products...</p>";
+
+  const q = query(
+    collection(db, "products"),
+    where("shopId", "==", shopId)
+  );
+
+  unsubProducts = onSnapshot(q, (snap) => {
+
+    if (snap.empty) {
+
+      list.innerHTML =
+        `<div class="error-box">
+          No products found.
+        </div>`;
+
+      return;
+    }
+
+    list.innerHTML = "";
+
+    snap.forEach(docSnap => {
+
+      const p = docSnap.data();
+
+      const id = docSnap.id;
+
+      const stock = p.stock ?? 0;
+
+      const badgeCls =
+        stock === 0
+          ? "badge-out"
+          : stock <= 3
+            ? "badge-low"
+            : "badge-ok";
+
+      const badgeTxt =
+        stock === 0
+          ? "Out of stock"
+          : stock <= 3
+            ? `Low stock: ${stock}`
+            : `In stock: ${stock}`;
+
+      const div = document.createElement("div");
+
+      div.className = "card product-card";
+
+      div.innerHTML = `
+        <div class="product-info">
+
+          <img
+            src="${p.image || 'https://placehold.co/55x55?text=Item'}"
+            alt="${p.name}"
+            onerror="this.src='https://placehold.co/55x55?text=No+Img'"
+          >
+
+          <div>
+
+            <b style="font-size:15px">
+              ${p.name}
+            </b>
+
+            <br>
+
+            <span style="color:#555">
+              ₹${p.price}
+            </span>
+
+            <br>
+
+            <span class="badge ${badgeCls}">
+              ${badgeTxt}
+            </span>
+
+          </div>
+
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+
+          <input
+            class="stock-input"
+            type="number"
+            id="stock-${id}"
+            value="${stock}"
+            min="0"
+          >
+
+          <button
+            class="btn btn-update"
+            onclick="updateStock('${id}')"
+          >
+            Update Stock
+          </button>
+
+          <button
+            class="btn btn-delete"
+            onclick="deleteProduct('${id}','${p.name.replace(/'/g,"\\'")}')"
+          >
+            Delete
+          </button>
+
+        </div>
+      `;
+
+      list.appendChild(div);
+
+    });
+
+  }, (err) => {
+
+    console.error(err);
+
+    list.innerHTML =
+      `<div class="error-box">
+        <b>Error:</b> ${err.message}
+      </div>`;
+  });
+};
+
+window.updateStock = async (id) => {
+
+  const val =
+    parseInt(
+      document.getElementById(`stock-${id}`).value
+    );
+
+  if (isNaN(val) || val < 0) {
+
+    showToast("Enter valid stock", "error");
+
+    return;
+  }
+
+  try {
+
+    await updateDoc(
+      doc(db, "products", id),
+      { stock: val }
+    );
+
+    showToast("Stock updated", "success");
+
+  } catch (e) {
+
+    console.error(e);
+
+    showToast("Failed: " + e.message, "error");
+  }
+};
+
+window.deleteProduct = async (id, name) => {
+
+  if (!confirm(`Delete "${name}" ?`)) return;
+
+  try {
+
+    await deleteDoc(doc(db, "products", id));
+
+    showToast("Product deleted", "success");
+
+  } catch (e) {
+
+    console.error(e);
+
+    showToast("Failed: " + e.message, "error");
+  }
+};
+
+function loadOrders() {
+
+  const list =
+    document.getElementById("orderList");
+
+  const q = query(
+    collection(db, "orders"),
+    orderBy("time", "desc")
+  );
+
+  onSnapshot(q, (snap) => {
+
+    if (snap.empty) {
+
+      list.innerHTML =
+        "<p style='color:#888'>No orders yet.</p>";
+
+      return;
+    }
+
+    list.innerHTML = "";
+
+    snap.forEach(docSnap => {
+
+      const o = docSnap.data();
+
+      const id = docSnap.id;
+
+      const itemsHtml =
+        (o.items || [])
+          .map(i =>
+            `${i.name} × ${i.qty} = ₹${i.price * i.qty}`
+          )
+          .join("<br>");
+
+      const time =
+        o.time
+          ? new Date(o.time).toLocaleString("en-IN")
+          : "—";
+
+      const status =
+        o.status || "placed";
+
+      const statusCls =
+        "status-" + status.split(" ")[0];
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "card order-card";
+
+      div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+
+          <div style="flex:1;min-width:200px">
+
+            <b style="font-size:15px">
+              ${o.orderId || id}
+            </b>
+
+            <span class="order-status ${statusCls}">
+              ${status}
+            </span>
+
+            <br>
+
+            <small style="color:#888">
+              ${time}
+            </small>
+
+            <br><br>
+
+            👤 <b>${o.name}</b><br>
+
+            📞 ${o.phone}<br>
+
+            📍 ${o.address}<br><br>
+
+            <div style="color:#333;line-height:1.8">
+              ${itemsHtml}
+            </div>
+
+            <br>
+
+            <b>Total: ₹${o.total}</b>
+
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:160px">
+
+            <label style="font-size:12px;color:#666;font-weight:bold">
+              Update Status:
+            </label>
+
+            <select
+              onchange="updateOrderStatus('${id}', this.value)"
+              style="padding:7px;border-radius:6px;border:1px solid #ccc;font-size:13px"
+            >
+
+              <option value="placed"
+                ${status==="placed"?"selected":""}>
+                Placed
+              </option>
+
+              <option value="preparing"
+                ${status==="preparing"?"selected":""}>
+                Preparing
+              </option>
+
+              <option value="out for delivery"
+                ${status==="out for delivery"?"selected":""}>
+                Out for delivery
+              </option>
+
+              <option value="delivered"
+                ${status==="delivered"?"selected":""}>
+                Delivered
+              </option>
+
+              <option value="cancelled"
+                ${status==="cancelled"?"selected":""}>
+                Cancelled
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+      `;
+
+      list.appendChild(div);
+
+    });
+
+  }, (err) => {
+
+    console.error(err);
+
+    list.innerHTML =
+      `<div class="error-box">
+        ${err.message}
+      </div>`;
+  });
+}
+
+window.updateOrderStatus = async (id, status) => {
+
+  try {
+
+    await updateDoc(
+      doc(db, "orders", id),
+      { status }
+    );
+
+    showToast("Status updated", "success");
+
+    if (
+      status === "delivered" ||
+      status === "cancelled"
+    ) {
+
+      setTimeout(async () => {
+
+        try {
+
+          await deleteDoc(
+            doc(db, "orders", id)
+          );
+
+          showToast(
+            "Order removed",
+            "success"
+          );
+
+        } catch (err) {
+
+          console.error(err);
+
+          showToast(
+            "Delete failed",
+            "error"
+          );
+        }
+
+      }, 500);
+    }
+
+  } catch (e) {
+
+    console.error(e);
+
+    showToast(
+      "Failed: " + e.message,
+      "error"
+    );
+  }
+};
+
+loadShops();
+
+</script>
+
+</body>
+</html>
