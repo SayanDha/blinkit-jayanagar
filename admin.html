@@ -1,835 +1,1136 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Panel</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jaynagar Quick Delivery | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        :root {
+            --primary: #2563eb; --primaryDark: #1d4ed8; --green: #16a34a; --orange: #f59e0b;
+            --red: #dc2626; --purple: #9333ea; --bg: #f3f4f6; --white: #ffffff;
+            --text: #1f2937; --border: #e5e7eb; --sidebar: #111827; --sidebarHover: #1f2937;
+        }
+        body { background: var(--bg); overflow-x: hidden; }
+        .wrapper { display: flex; min-height: 100vh; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 260px; background: var(--sidebar); color: white; position: fixed; left: 0; top: 0; bottom: 0; overflow-y: auto; }
+        .logo { padding: 24px; font-size: 24px; font-weight: 700; text-align: center; border-bottom: 1px solid rgba(255,255,255,.08); }
+        .logo span { color: #38bdf8; }
+        .menu { padding: 20px 0; }
+        .menu button { width: 100%; padding: 16px 28px; border: none; background: none; color: white; cursor: pointer; text-align: left; font-size: 15px; transition: .25s; display: flex; align-items: center; gap: 12px; }
+        .menu button:hover { background: var(--sidebarHover); }
+        .menu button.active { background: var(--primary); }
+        
+        /* MAIN */
+        .main { margin-left: 260px; width: calc(100% - 260px); }
+        
+        /* HEADER */
+        .header { background: white; padding: 20px 35px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,.05); position: sticky; top: 0; z-index: 50; }
+        .header h2 { font-size: 28px; color: var(--text); }
+        .headerRight { display: flex; align-items: center; gap: 15px; }
+        .adminBadge { padding: 8px 16px; background: #dcfce7; color: var(--green); font-weight: 600; border-radius: 30px; }
+        .logoutBtn { padding: 10px 18px; background: var(--red); border: none; color: white; border-radius: 8px; cursor: pointer; }
+        
+        /* CONTENT & CARDS */
+        .content { padding: 30px; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 22px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+        .card h3 { font-size: 14px; color: #777; margin-bottom: 12px; }
+        .card h1 { font-size: 34px; color: var(--text); }
+        .blue { border-left: 6px solid var(--primary); }
+        .green { border-left: 6px solid var(--green); }
+        .orange { border-left: 6px solid var(--orange); }
+        .purple { border-left: 6px solid var(--purple); }
+        
+        /* SECTIONS & FILTERS */
+        .section { margin-top: 30px; background: white; padding: 24px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+        .sectionTitle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .sectionTitle h2 { font-size: 22px; color: var(--text); }
+        .filterBar { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 15px; margin-bottom: 20px; }
+        .filterBar input, .filterBar select { padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; }
+        
+        /* BUTTONS & TABLES */
+        .btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; text-align: center; }
+        .primary { background: var(--primary); color: white; }
+        .success { background: var(--green); color: white; }
+        .warning { background: var(--orange); color: white; }
+        .danger { background: var(--red); color: white; }
+        .tableWrapper { overflow: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #eef4ff; padding: 14px; text-align: left; }
+        td { padding: 14px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #fafafa; }
+        
+        /* STATUS BADGES */
+        .badge { padding: 6px 12px; border-radius: 30px; font-size: 13px; font-weight: 600; display: inline-block; }
+        .pending { background: #fff3cd; color: #946200; }
+        .accepted { background: #d1f7dd; color: #146c43; }
+        .preparing { background: #dbeafe; color: #1d4ed8; }
+        .ready { background: #ede9fe; color: #6d28d9; }
+        .picked { background: #ffe4c7; color: #b45309; }
+        .delivered { background: #dcfce7; color: #15803d; }
+        .cancelled { background: #fee2e2; color: #b91c1c; }
+        
+        /* ORDER DETAILS */
+        .orderDetails { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+        .box { border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .box h3 { margin-bottom: 15px; color: var(--text); }
 
-  <style>
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: Arial;
-      padding: 20px;
-      background: #f5f5f5;
-      max-width: 750px;
-      margin: auto;
-    }
-
-    h1 { color: #111; }
-
-    select {
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .btn {
-      padding: 7px 14px;
-      border-radius: 6px;
-      border: none;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .btn-update { background: #1565c0; }
-    .btn-delete { background: #c62828; }
-
-    .btn:hover {
-      opacity: 0.85;
-    }
-
-    .card {
-      background: white;
-      padding: 14px;
-      margin: 10px 0;
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    }
-
-    .product-card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .product-info {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .product-info img {
-      width: 55px;
-      height: 55px;
-      border-radius: 6px;
-      object-fit: cover;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 99px;
-      font-size: 12px;
-      font-weight: bold;
-      margin-top: 4px;
-    }
-
-    .badge-ok {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-
-    .badge-low {
-      background: #fff8e1;
-      color: #e65100;
-    }
-
-    .badge-out {
-      background: #ffebee;
-      color: #c62828;
-    }
-
-    .stock-input {
-      width: 75px;
-      padding: 6px 8px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      text-align: center;
-    }
-
-    .order-card {
-      border-left: 4px solid #1565c0;
-    }
-
-    .order-status {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 99px;
-      font-size: 12px;
-      font-weight: bold;
-      margin-left: 6px;
-    }
-
-    .status-placed {
-      background: #e3f2fd;
-      color: #0d47a1;
-    }
-
-    .status-preparing {
-      background: #fff3e0;
-      color: #e65100;
-    }
-
-    .status-out {
-      background: #f3e5f5;
-      color: #6a1b9a;
-    }
-
-    .status-delivered {
-      background: #e8f5e9;
-      color: #1b5e20;
-    }
-
-    .status-cancelled {
-      background: #ffebee;
-      color: #b71c1c;
-    }
-
-    .section-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin: 28px 0 10px;
-      color: #111;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 6px;
-    }
-
-    .error-box {
-      background: #ffebee;
-      color: #c62828;
-      border: 1px solid #ef9a9a;
-      padding: 12px;
-      border-radius: 8px;
-      margin: 10px 0;
-      font-size: 14px;
-    }
-
-    #toast {
-      display: none;
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 22px;
-      border-radius: 8px;
-      font-size: 14px;
-      z-index: 999;
-      color: white;
-      min-width: 200px;
-      text-align: center;
-    }
-
-    #toast.show {
-      display: block;
-    }
-
-    #toast.success {
-      background: #2e7d32;
-    }
-
-    #toast.error {
-      background: #c62828;
-    }
-
-    #toast.info {
-      background: #333;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-
-  </style>
+        /* FORM GRID FOR CREATION */
+        .formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .formInput { padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; width: 100%; }
+        
+        /* RESPONSIVE */
+        @media(max-width: 950px){
+            .sidebar { left: -260px; transition: .3s; }
+            .sidebar.show { left: 0; }
+            .main { margin-left: 0; width: 100%; }
+            .header { padding: 18px; }
+            .content { padding: 18px; }
+            .filterBar { grid-template-columns: 1fr; }
+            .orderDetails { grid-template-columns: 1fr; }
+            .formGrid { grid-template-columns: 1fr; }
+        }
+        .hidden { display: none; }
+    </style>
 </head>
-
 <body>
 
-<h1>🛠 Admin Panel</h1>
-
-<label><b>Shop: </b></label>
-
-<select id="shopSelect" onchange="loadProducts()">
-  <option value="">-- Loading shops... --</option>
-</select>
-
-<div class="section-title">Add Product</div>
-
-<div class="card">
-
-  <input
-    type="text"
-    id="newProductName"
-    class="form-input"
-    placeholder="Product Name"
-  >
-
-  <input
-    type="number"
-    id="newProductPrice"
-    class="form-input"
-    placeholder="Product Price"
-  >
-
-  <input
-    type="number"
-    id="newProductStock"
-    class="form-input"
-    placeholder="Product Stock"
-  >
-
-  <input
-    type="text"
-    id="newProductImage"
-    class="form-input"
-    placeholder="Product Image URL"
-  >
-
-  <button
-    class="btn btn-update"
-    onclick="addProduct()"
-  >
-    Add Product
-  </button>
-
-</div>
-
-<div class="section-title">Products</div>
-
-<div id="productList">
-  <p style="color:#888">Waiting for shop selection...</p>
-</div>
-
-<div class="section-title">Orders (real-time)</div>
-
-<div id="orderList">
-  <p style="color:#888">Loading orders...</p>
-</div>
-
-<div id="toast"></div>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  onSnapshot,
-  query,
-  where,
-  orderBy,
-  updateDoc,
-  deleteDoc,
-  doc,
-  addDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBEgVRjqj5SshWvkUsM2pPbPs6dMP77wAw",
-  authDomain: "jayanagar-delivery.firebaseapp.com",
-  projectId: "jayanagar-delivery",
-  storageBucket: "jayanagar-delivery.firebasestorage.app",
-  messagingSenderId: "460592006643",
-  appId: "1:460592006643:web:998daeb371e9e342043e86",
-  measurementId: "G-7L7T72ENL1"
-};
-
-let app, db;
-
-try {
-
-  app = initializeApp(firebaseConfig);
-
-  db = getFirestore(app);
-
-} catch (e) {
-
-  document.body.innerHTML =
-    `<h2 style="color:red">
-      Firebase init failed: ${e.message}
-    </h2>`;
-
-  throw e;
-}
-
-let unsubProducts = null;
-
-function showToast(msg, type = "info") {
-
-  const t = document.getElementById("toast");
-
-  t.textContent = msg;
-
-  t.className = "show " + type;
-
-  clearTimeout(t._timer);
-
-  t._timer = setTimeout(() => {
-    t.className = "";
-  }, 3000);
-}
-
-async function loadShops() {
-
-  const sel = document.getElementById("shopSelect");
-
-  try {
-
-    const snap = await getDocs(collection(db, "shops"));
-
-    if (snap.empty) {
-
-      sel.innerHTML =
-        '<option value="">No shops found</option>';
-
-      return;
-    }
-
-    sel.innerHTML = "";
-
-    snap.forEach(d => {
-
-      const opt = document.createElement("option");
-
-      opt.value = d.id;
-
-      opt.textContent = d.data().name || d.id;
-
-      sel.appendChild(opt);
-    });
-
-    loadProducts();
-
-    loadOrders();
-
-  } catch (e) {
-
-    console.error(e);
-
-    sel.innerHTML =
-      '<option value="">Error loading shops</option>';
-  }
-}
-
-window.addProduct = async () => {
-
-  const shopId =
-    document.getElementById("shopSelect").value;
-
-  const name =
-    document.getElementById("newProductName").value.trim();
-
-  const price =
-    parseFloat(
-      document.getElementById("newProductPrice").value
-    );
-
-  const stock =
-    parseInt(
-      document.getElementById("newProductStock").value
-    );
-
-  const image =
-    document.getElementById("newProductImage").value.trim();
-
-  if (!shopId) {
-
-    showToast("Please select a shop", "error");
-
-    return;
-  }
-
-  if (!name || isNaN(price) || isNaN(stock)) {
-
-    showToast("Fill all fields correctly", "error");
-
-    return;
-  }
-
-  try {
-
-    await addDoc(collection(db, "products"), {
-
-      name,
-      price,
-      stock,
-      image,
-      shopId
-
-    });
-
-    showToast("Product added successfully", "success");
-
-    document.getElementById("newProductName").value = "";
-    document.getElementById("newProductPrice").value = "";
-    document.getElementById("newProductStock").value = "";
-    document.getElementById("newProductImage").value = "";
-
-  } catch (e) {
-
-    console.error(e);
-
-    showToast("Failed: " + e.message, "error");
-  }
-};
-
-window.loadProducts = function () {
-
-  const shopId =
-    document.getElementById("shopSelect").value;
-
-  const list =
-    document.getElementById("productList");
-
-  if (!shopId) {
-
-    list.innerHTML =
-      "<p style='color:#888'>Select a shop.</p>";
-
-    return;
-  }
-
-  if (unsubProducts) {
-
-    unsubProducts();
-
-    unsubProducts = null;
-  }
-
-  list.innerHTML =
-    "<p style='color:#888'>Loading products...</p>";
-
-  const q = query(
-    collection(db, "products"),
-    where("shopId", "==", shopId)
-  );
-
-  unsubProducts = onSnapshot(q, (snap) => {
-
-    if (snap.empty) {
-
-      list.innerHTML =
-        `<div class="error-box">
-          No products found.
-        </div>`;
-
-      return;
-    }
-
-    list.innerHTML = "";
-
-    snap.forEach(docSnap => {
-
-      const p = docSnap.data();
-
-      const id = docSnap.id;
-
-      const stock = p.stock ?? 0;
-
-      const badgeCls =
-        stock === 0
-          ? "badge-out"
-          : stock <= 3
-            ? "badge-low"
-            : "badge-ok";
-
-      const badgeTxt =
-        stock === 0
-          ? "Out of stock"
-          : stock <= 3
-            ? `Low stock: ${stock}`
-            : `In stock: ${stock}`;
-
-      const div = document.createElement("div");
-
-      div.className = "card product-card";
-
-      div.innerHTML = `
-        <div class="product-info">
-
-          <img
-            src="${p.image || 'https://placehold.co/55x55?text=Item'}"
-            alt="${p.name}"
-            onerror="this.src='https://placehold.co/55x55?text=No+Img'"
-          >
-
-          <div>
-
-            <b style="font-size:15px">
-              ${p.name}
-            </b>
-
-            <br>
-
-            <span style="color:#555">
-              ₹${p.price}
-            </span>
-
-            <br>
-
-            <span class="badge ${badgeCls}">
-              ${badgeTxt}
-            </span>
-
-          </div>
-
+<div class="wrapper">
+    <div class="sidebar" id="sidebar">
+        <div class="logo">JQD <span>Admin</span></div>
+        <div class="menu">
+            <button class="active" onclick="window.showPage('dashboard', this)">🏠 Dashboard</button>
+            <button onclick="window.showPage('orders', this)">📦 Orders</button>
+            <button onclick="window.showPage('shops', this)">🏪 Shops</button>
+            <button onclick="window.showPage('products', this)">🛒 Products</button>
+            <button onclick="window.showPage('delivery', this)">🚚 Delivery</button>
+            <button onclick="window.showPage('customers', this)">👤 Customers</button>
+            <button onclick="window.showPage('settings', this)">⚙ Settings</button>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <h2>Platform Admin Dashboard</h2>
+            <div class="headerRight">
+                <div class="adminBadge">🟢 System Online</div>
+                <button class="logoutBtn" onclick="alert('Admin Session Closed')">Logout</button>
+            </div>
         </div>
 
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="content">
+            <div id="dashboardPage">
+                <div class="cards">
+                    <div class="card blue">
+                        <h3>Total Orders</h3>
+                        <h1 id="totalOrders">0</h1>
+                    </div>
+                    <div class="card green">
+                        <h3>Today's Orders</h3>
+                        <h1 id="todayOrders">0</h1>
+                    </div>
+                    <div class="card orange">
+                        <h3>Pending Orders</h3>
+                        <h1 id="pendingOrders">0</h1>
+                    </div>
+                    <div class="card purple">
+                        <h3>Total Revenue</h3>
+                        <h1 id="totalRevenue">₹0</h1>
+                    </div>
+                </div>
 
-          <input
-            class="stock-input"
-            type="number"
-            id="stock-${id}"
-            value="${stock}"
-            min="0"
-          >
-
-          <button
-            class="btn btn-update"
-            onclick="updateStock('${id}')"
-          >
-            Update Stock
-          </button>
-
-          <button
-            class="btn btn-delete"
-            onclick="deleteProduct('${id}','${p.name.replace(/'/g,"\\'")}')"
-          >
-            Delete
-          </button>
-
-        </div>
-      `;
-
-      list.appendChild(div);
-
-    });
-
-  }, (err) => {
-
-    console.error(err);
-
-    list.innerHTML =
-      `<div class="error-box">
-        <b>Error:</b> ${err.message}
-      </div>`;
-  });
-};
-
-window.updateStock = async (id) => {
-
-  const val =
-    parseInt(
-      document.getElementById(`stock-${id}`).value
-    );
-
-  if (isNaN(val) || val < 0) {
-
-    showToast("Enter valid stock", "error");
-
-    return;
-  }
-
-  try {
-
-    await updateDoc(
-      doc(db, "products", id),
-      { stock: val }
-    );
-
-    showToast("Stock updated", "success");
-
-  } catch (e) {
-
-    console.error(e);
-
-    showToast("Failed: " + e.message, "error");
-  }
-};
-
-window.deleteProduct = async (id, name) => {
-
-  if (!confirm(`Delete "${name}" ?`)) return;
-
-  try {
-
-    await deleteDoc(doc(db, "products", id));
-
-    showToast("Product deleted", "success");
-
-  } catch (e) {
-
-    console.error(e);
-
-    showToast("Failed: " + e.message, "error");
-  }
-};
-
-function loadOrders() {
-
-  const list =
-    document.getElementById("orderList");
-
-  const q = query(
-    collection(db, "orders"),
-    orderBy("time", "desc")
-  );
-
-  onSnapshot(q, (snap) => {
-
-    if (snap.empty) {
-
-      list.innerHTML =
-        "<p style='color:#888'>No orders yet.</p>";
-
-      return;
-    }
-
-    list.innerHTML = "";
-
-    snap.forEach(docSnap => {
-
-      const o = docSnap.data();
-
-      const id = docSnap.id;
-
-      const itemsHtml =
-        (o.items || [])
-          .map(i =>
-            `${i.name} × ${i.qty} = ₹${i.price * i.qty}`
-          )
-          .join("<br>");
-
-      const time =
-        o.time
-          ? new Date(o.time).toLocaleString("en-IN")
-          : "—";
-
-      const status =
-        o.status || "placed";
-
-      const statusCls =
-        "status-" + status.split(" ")[0];
-
-      const div =
-        document.createElement("div");
-
-      div.className =
-        "card order-card";
-
-      div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
-
-          <div style="flex:1;min-width:200px">
-
-            <b style="font-size:15px">
-              ${o.orderId || id}
-            </b>
-
-            <span class="order-status ${statusCls}">
-              ${status}
-            </span>
-
-            <br>
-
-            <small style="color:#888">
-              ${time}
-            </small>
-
-            <br><br>
-
-            👤 <b>${o.name}</b><br>
-
-            📞 ${o.phone}<br>
-
-            📍 ${o.address}<br><br>
-
-            <div style="color:#333;line-height:1.8">
-              ${itemsHtml}
+                <div class="section">
+                    <div class="sectionTitle">
+                        <h2>Recent Customer Orders</h2>
+                        <button class="btn primary" id="refreshDashboardBtn">Refresh</button>
+                    </div>
+                    <div class="tableWrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Shops</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardOrdersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
-            <br>
+            <div id="ordersPage" class="hidden">
+                <div class="section">
+                    <div class="sectionTitle">
+                        <h2>All Customer Orders</h2>
+                    </div>
+                    <div class="filterBar">
+                        <input type="text" id="searchOrder" placeholder="Search Order ID / Customer / Phone">
+                        <select id="statusFilter">
+                            <option value="all">All Status</option>
+                            <option value="placed">Placed</option>
+                            <option value="accepted">Accepted</option>
+                            <option value="preparing">Preparing</option>
+                            <option value="ready">Ready</option>
+                            <option value="picked_up">Picked Up</option>
+                            <option value="driver_accepted">Driver Accepted</option>
+                            <option value="out_for_delivery">Out For Delivery</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <select id="shopFilter">
+                            <option value="all">All Shops</option>
+                        </select>
+                        <button class="btn primary" id="applyFilterBtn">Reset Filters</button>
+                    </div>
+                    <div class="tableWrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Items</th>
+                                    <th>Delivery</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>View</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="section">
+                    <div class="sectionTitle"><h2>Order Details</h2></div>
+                    <div class="orderDetails" id="orderDetails">
+                        <div class="box">
+                            <h3>Products</h3>
+                            <div id="productsInOrder">Select an order from the list above.</div>
+                        </div>
+                        <div class="box">
+                            <h3>Customer Details</h3>
+                            <div id="customerDetails">Select an order from the list above.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <b>Total: ₹${o.total}</b>
+            <div id="shopsPage" class="hidden">
+                <div class="section">
+                    <div class="sectionTitle"><h2>Register New Shop</h2></div>
+                    <div class="formGrid">
+                        <input type="text" id="newShopName" class="formInput" placeholder="Shop Name (e.g. Rahul's Grocery)">
+                        <input type="text" id="newShopOwner" class="formInput" placeholder="Owner Name">
+                        <input type="text" id="newShopLogin" class="formInput" placeholder="Login ID">
+                        <input type="password" id="newShopPass" class="formInput" placeholder="Password">
+                    </div>
+                    <button class="btn primary" id="createShopBtn" style="width: 100%; padding: 12px; font-size: 16px;">Create Shop Account</button>
+                </div>
 
-          </div>
+                <div class="section">
+                    <div class="sectionTitle">
+                        <h2>Registered Shops</h2>
+                        <button class="btn success" id="refreshShopsBtn">Refresh</button>
+                    </div>
+                    <div class="tableWrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Shop Name</th>
+                                    <th>Owner</th>
+                                    <th>Login ID</th>
+                                    <th>Total Products</th>
+                                    <th>Status</th>
+                                    <th>Manage Catalog</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shopsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-          <div style="display:flex;flex-direction:column;gap:6px;min-width:160px">
+            <div id="productsPage" class="hidden">
+                <div class="section">
+                    <div class="sectionTitle"><h2>Add Product to Shop</h2></div>
+                    <div class="formGrid">
+                        <input type="text" id="adminProdName" class="formInput" placeholder="Product Name (e.g. Apple)">
+                        <input type="number" id="adminProdPrice" class="formInput" placeholder="Price (₹)">
+                        <input type="number" id="adminProdStock" class="formInput" placeholder="Stock Quantity">
+                        <input type="text" id="adminProdImage" class="formInput" placeholder="Image URL (e.g. https://...)">
+                    </div>
+                    <div class="formGrid">
+                        <select id="adminProdShopSelect" class="formInput">
+                            <option value="">-- Select Shop to assign to --</option>
+                        </select>
+                        <button class="btn success" id="adminAddProdBtn" style="padding: 12px; font-size: 16px;">Add Product</button>
+                    </div>
+                </div>
 
-            <label style="font-size:12px;color:#666;font-weight:bold">
-              Update Status:
-            </label>
+                <div class="section">
+                    <div class="sectionTitle"><h2>Platform Products</h2></div>
+                    <div class="filterBar">
+                        <input id="searchProduct" placeholder="Search Product">
+                        <select id="productShopFilter">
+                            <option value="all">All Shops</option>
+                        </select>
+                        <button class="btn primary" id="searchProductBtn">Search</button>
+                    </div>
+                    <div class="tableWrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Product</th>
+                                    <th>Shop</th>
+                                    <th>Price</th>
+                                    <th>Stock</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-            <select
-              onchange="updateOrderStatus('${id}', this.value)"
-              style="padding:7px;border-radius:6px;border:1px solid #ccc;font-size:13px"
-            >
+            <div id="deliveryPage" class="hidden">
+                <div class="section">
+                    <div class="sectionTitle"><h2>Register Delivery Partner</h2></div>
+                    <div class="formGrid">
+                        <input type="text" id="newDeliveryName" class="formInput" placeholder="Partner Name (e.g. Amit Kumar)">
+                        <input type="text" id="newDeliveryPhone" class="formInput" placeholder="Phone Number">
+                        <input type="text" id="newDeliveryLogin" class="formInput" placeholder="Login ID">
+                        <input type="password" id="newDeliveryPass" class="formInput" placeholder="Password">
+                    </div>
+                    <button class="btn primary" id="createDeliveryBtn" style="width: 100%; padding: 12px; font-size: 16px;">Create Delivery Account</button>
+                </div>
 
-              <option value="placed"
-                ${status==="placed"?"selected":""}>
-                Placed
-              </option>
+                <div class="section">
+                    <div class="sectionTitle">
+                        <h2>Delivery Partners</h2>
+                        <button class="btn success" id="refreshDeliveryBtn">Refresh</button>
+                    </div>
+                    <div class="tableWrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Login ID</th>
+                                    <th>Status</th>
+                                    <th>Current Order</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deliveryTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="section">
+                    <div class="sectionTitle"><h2>Assign Delivery Partner</h2></div>
+                    <div class="filterBar">
+                        <select id="assignOrderSelect">
+                            <option value="">Select Order</option>
+                        </select>
+                        <select id="assignPartnerSelect">
+                            <option value="">Select Delivery Partner</option>
+                        </select>
+                        <button class="btn primary" id="assignDeliveryBtn">Assign Order</button>
+                    </div>
+                </div>
+            </div>
 
-              <option value="preparing"
-                ${status==="preparing"?"selected":""}>
-                Preparing
-              </option>
+            <div id="customersPage" class="hidden">
+                <div class="section">
+                    <div class="sectionTitle">
+                        <h2>Customers</h2>
+                        <button class="btn primary" id="refreshCustomersBtn">Refresh</button>
+                    </div>
+                    <div class="tableWrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone</th>
+                                    <th>Total Orders</th>
+                                    <th>Total Spending</th>
+                                    <th>Last Order</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-              <option value="out for delivery"
-                ${status==="out for delivery"?"selected":""}>
-                Out for delivery
-              </option>
-
-              <option value="delivered"
-                ${status==="delivered"?"selected":""}>
-                Delivered
-              </option>
-
-              <option value="cancelled"
-                ${status==="cancelled"?"selected":""}>
-                Cancelled
-              </option>
-
-            </select>
-
-          </div>
-
+            <div id="settingsPage" class="hidden">
+                <div class="section">
+                    <div class="sectionTitle"><h2>Platform Settings</h2></div>
+                    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:25px;">
+                        <div style="border:1px solid var(--border); border-radius:12px; padding:20px;">
+                            <h3>Delivery Settings</h3><br>
+                            <label>Default Delivery Charge</label>
+                            <input type="number" id="deliveryCharge" value="30" style="padding:10px; width:100%; border-radius:6px; border:1px solid #ccc; margin-top:5px;"><br><br>
+                            <label>Platform Name</label>
+                            <input type="text" id="platformName" value="Jaynagar Quick Delivery" style="padding:10px; width:100%; border-radius:6px; border:1px solid #ccc; margin-top:5px;"><br><br>
+                            <button class="btn success" id="saveSettingsBtn">Save Settings</button>
+                        </div>
+                        <div style="border:1px solid var(--border); border-radius:12px; padding:20px;">
+                            <h3>Firebase Status</h3><br>
+                            <p>Firestore: <span style="color:green; font-weight:bold;">Connected</span></p><br>
+                            <p>Architecture</p>
+                            <ul style="margin-left:18px; margin-top:10px; line-height:28px;">
+                                <li>One Checkout = One Order</li>
+                                <li>Multiple Shops inside same Order</li>
+                                <li>Delivery Charge added once</li>
+                                <li>COD Payment</li>
+                                <li>Admin Supremacy Active</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      `;
+    </div>
+</div>
 
-      list.appendChild(div);
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+        getFirestore, 
+        collection, 
+        doc, 
+        getDocs, 
+        getDoc, 
+        onSnapshot, 
+        query, 
+        updateDoc, 
+        deleteDoc,
+        addDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    });
+    const firebaseConfig = {
+        apiKey: "AIzaSyBEgVRjqj5SshWvkUsM2pPbPs6dMP77wAw",
+        authDomain: "jayanagar-delivery.firebaseapp.com",
+        projectId: "jayanagar-delivery",
+        storageBucket: "jayanagar-delivery.firebasestorage.app",
+        messagingSenderId: "460592006643",
+        appId: "1:460592006643:web:998daeb371e9e342043e86",
+        measurementId: "G-7L7T72ENL1"
+    };
 
-  }, (err) => {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    console.error(err);
+    let orders = [];
+    let shops = [];
+    let products = [];
+    let deliveryPartners = [];
 
-    list.innerHTML =
-      `<div class="error-box">
-        ${err.message}
-      </div>`;
-  });
-}
-
-window.updateOrderStatus = async (id, status) => {
-
-  try {
-
-    await updateDoc(
-      doc(db, "orders", id),
-      { status }
-    );
-
-    showToast("Status updated", "success");
-
-    if (
-      status === "delivered" ||
-      status === "cancelled"
-    ) {
-
-      setTimeout(async () => {
-
-        try {
-
-          await deleteDoc(
-            doc(db, "orders", id)
-          );
-
-          showToast(
-            "Order removed",
-            "success"
-          );
-
-        } catch (err) {
-
-          console.error(err);
-
-          showToast(
-            "Delete failed",
-            "error"
-          );
+    /* ==========================================
+       DYNAMIC PRICE CALCULATION LOGIC
+    ========================================== */
+    function calculateDynamicTotal(order) {
+        let itemTotal = 0;
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                const shopStatus = (order.shopStatuses && order.shopStatuses[item.shopId]) ? order.shopStatuses[item.shopId] : 'pending';
+                // Only count the item if the shop hasn't rejected it
+                if (shopStatus !== 'rejected') {
+                    itemTotal += (Number(item.price) * Number(item.qty));
+                }
+            });
+        } else {
+            return order.total || 0; 
         }
-
-      }, 500);
+        const deliveryCharge = Number(order.deliveryCharge) || 0;
+        return itemTotal + deliveryCharge;
     }
 
-  } catch (e) {
+    /* ==========================================
+       STATUS CSS CLASS MAPPER & RESOLVER
+    ========================================== */
+    
+    // NEW: Resolve the overall status of a multi-vendor order based on individual shop responses
+    function getOverallStatus(order) {
+        // If master status has been manually progressed beyond basic states, respect it
+        const advancedStatuses = ['preparing', 'ready', 'picked_up', 'driver_accepted', 'out_for_delivery', 'delivered', 'cancelled'];
+        if (advancedStatuses.includes(order.status)) {
+            return order.status;
+        }
+        
+        // Otherwise, dynamically determine status from individual shop responses
+        if (order.shopStatuses && Object.keys(order.shopStatuses).length > 0) {
+            const statuses = Object.values(order.shopStatuses);
+            if (statuses.includes('accepted')) return 'accepted';
+            if (statuses.every(s => s === 'rejected')) return 'cancelled';
+        }
+        return order.status || 'placed';
+    }
 
-    console.error(e);
+    function getStatusClass(status) {
+        const s = (status || "").toLowerCase();
+        const map = {
+            "placed": "pending",
+            "accepted": "accepted",
+            "preparing": "preparing",
+            "ready": "ready",
+            "picked_up": "picked",
+            "out_for_delivery": "preparing",
+            "delivered": "delivered",
+            "cancelled": "cancelled",
+            "assigned": "preparing", 
+            "driver_accepted": "accepted" 
+        };
+        return map[s] || "pending";
+    }
 
-    showToast(
-      "Failed: " + e.message,
-      "error"
-    );
-  }
-};
+    function formatStatus(status) {
+        if (!status) return "Unknown";
+        return status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
 
-loadShops();
+    /* ==========================================
+       SIDEBAR INTERACTION PAGE ROUTING
+    ========================================== */
+    window.showPage = function(pageId, btnElement) {
+        document.querySelectorAll('.content > div').forEach(div => {
+            div.classList.add('hidden');
+        });
+        
+        const targetPage = document.getElementById(pageId + 'Page');
+        if (targetPage) targetPage.classList.remove('hidden');
 
+        document.querySelectorAll('.menu button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        if (btnElement) btnElement.classList.add('active');
+    };
+
+    /* ==========================================
+       INITIAL RUN HANDLER
+    ========================================== */
+    loadDashboard();
+
+    async function loadDashboard() {
+        try {
+            await loadShops(); 
+            loadOrders();
+            loadProducts();
+            loadDeliveryPartners();
+        } catch(error) {
+            console.error("Error connecting to Firebase:", error);
+            alert("Could not load data. Please check your connection rules.");
+        }
+    }
+
+    /* ==========================================
+       LOAD & CREATE SHOPS PIPELINE
+    ========================================== */
+    // CREATE SHOP
+    document.getElementById("createShopBtn").addEventListener("click", async () => {
+        const name = document.getElementById("newShopName").value;
+        const owner = document.getElementById("newShopOwner").value;
+        const loginId = document.getElementById("newShopLogin").value;
+        const pass = document.getElementById("newShopPass").value;
+
+        if(!name || !owner || !loginId || !pass) return alert("Please fill all shop details.");
+
+        try {
+            await addDoc(collection(db, "shops"), {
+                name, ownerName: owner, loginId, password: pass, phone: "", status: "active"
+            });
+            alert("New Shop created! They can now log in.");
+            document.getElementById("newShopName").value = "";
+            document.getElementById("newShopOwner").value = "";
+            document.getElementById("newShopLogin").value = "";
+            document.getElementById("newShopPass").value = "";
+            loadShops();
+        } catch(e) { console.error(e); alert("Error creating shop."); }
+    });
+
+    // DELETE SHOP
+    window.deleteShop = async function(shopId) {
+        if(!confirm("Are you sure you want to delete this shop entirely?")) return;
+        try {
+            await deleteDoc(doc(db, "shops", shopId));
+            alert("Shop deleted.");
+            loadShops();
+        } catch(e) { alert("Error deleting shop."); }
+    };
+
+    // GO TO SHOP PRODUCTS
+    window.openShopProducts = function(shopId) {
+        const productsBtn = document.querySelectorAll('.menu button')[3]; 
+        window.showPage('products', productsBtn);
+        
+        document.getElementById("productShopFilter").value = shopId;
+        document.getElementById("adminProdShopSelect").value = shopId;
+        
+        filterProductsList();
+        document.getElementById("adminProdName").focus();
+    };
+
+    async function loadShops() {
+        const snapshot = await getDocs(collection(db, "shops"));
+        shops = [];
+        document.getElementById("shopFilter").innerHTML = '<option value="all">All Shops</option>';
+        document.getElementById("productShopFilter").innerHTML = '<option value="all">All Shops</option>';
+        document.getElementById("adminProdShopSelect").innerHTML = '<option value="">-- Select Shop to assign to --</option>';
+        document.getElementById("shopsTable").innerHTML = "";
+
+        snapshot.forEach(docSnap => {
+            const shop = { id: docSnap.id, ...docSnap.data() };
+            shops.push(shop);
+            
+            document.getElementById("shopFilter").innerHTML += `<option value="${shop.id}">${shop.name}</option>`;
+            document.getElementById("productShopFilter").innerHTML += `<option value="${shop.id}">${shop.name}</option>`;
+            document.getElementById("adminProdShopSelect").innerHTML += `<option value="${shop.id}">${shop.name}</option>`;
+            
+            document.getElementById("shopsTable").innerHTML += `
+                <tr>
+                    <td>${shop.name || "-"}</td>
+                    <td>${shop.ownerName || "-"}</td>
+                    <td>${shop.loginId || "-"}</td>
+                    <td id="productCount-${shop.id}">0</td>
+                    <td><span class="badge accepted">Online</span></td>
+                    <td>
+                        <button class="btn primary" onclick="openShopProducts('${shop.id}')">📦 Manage Products</button>
+                    </td>
+                    <td>
+                        <button class="btn danger" onclick="deleteShop('${shop.id}')">Delete</button>
+                    </td>
+                </tr>
+            `;
+        });
+        updateShopProductCounts();
+    }
+
+    /* ==========================================
+       LOAD & CREATE PRODUCTS DATA STREAM
+    ========================================== */
+    // ADMIN ADD PRODUCT
+    document.getElementById("adminAddProdBtn").addEventListener("click", async () => {
+        const name = document.getElementById("adminProdName").value;
+        const price = Number(document.getElementById("adminProdPrice").value);
+        const stock = Number(document.getElementById("adminProdStock").value);
+        const image = document.getElementById("adminProdImage").value || "https://placehold.co/100";
+        const shopId = document.getElementById("adminProdShopSelect").value;
+
+        if(!name || !price || !shopId) return alert("Please fill Name, Price, and Select a Shop.");
+
+        try {
+            await addDoc(collection(db, "products"), {
+                name: name, price: price, stock: stock || 0, shopId: shopId, image: image
+            });
+            alert("Product added successfully to shop!");
+            document.getElementById("adminProdName").value = "";
+            document.getElementById("adminProdPrice").value = "";
+            document.getElementById("adminProdStock").value = "";
+            document.getElementById("adminProdImage").value = "";
+        } catch(e) { alert("Error adding product."); }
+    });
+
+    // DELETE PRODUCT
+    window.deleteProduct = async function(prodId) {
+        if(confirm("Delete this product?")) await deleteDoc(doc(db, "products", prodId));
+    };
+
+    // UPDATE PRODUCT STOCK INLINE
+    window.updateStock = async function(prodId) {
+        const newStockVal = document.getElementById(`stockInput-${prodId}`).value;
+        try {
+            await updateDoc(doc(db, "products", prodId), {
+                stock: Number(newStockVal)
+            });
+            alert("Stock updated successfully!");
+        } catch (error) {
+            console.error(error);
+            alert("Failed to update stock.");
+        }
+    };
+
+    function loadProducts() {
+        onSnapshot(collection(db, "products"), (snapshot) => {
+            products = [];
+            document.getElementById("productsTable").innerHTML = "";
+            
+            snapshot.forEach(docSnap => {
+                const product = { id: docSnap.id, ...docSnap.data() };
+                products.push(product);
+                
+                document.getElementById("productsTable").innerHTML += `
+                    <tr data-shop-id="${product.shopId}">
+                        <td>
+                            <img src="${product.image || 'https://placehold.co/60'}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;">
+                        </td>
+                        <td>${product.name}</td>
+                        <td>${getShopName(product.shopId)}</td>
+                        <td>₹${product.price}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <input type="number" id="stockInput-${product.id}" value="${product.stock}" style="width: 70px; padding: 6px; border: 1px solid #ccc; border-radius: 6px;">
+                                <button class="btn success" style="padding: 6px 12px;" onclick="updateStock('${product.id}')">Save</button>
+                            </div>
+                        </td>
+                        <td>
+                            ${product.stock > 0 
+                                ? '<span class="badge accepted">Available</span>' 
+                                : '<span class="badge cancelled">Out of Stock</span>'}
+                        </td>
+                        <td><button class="btn danger" onclick="deleteProduct('${product.id}')">Delete</button></td>
+                    </tr>
+                `;
+            });
+            updateShopProductCounts();
+            filterProductsList(); 
+        });
+    }
+
+    function updateShopProductCounts() {
+        shops.forEach(shop => {
+            const count = products.filter(p => String(p.shopId) === String(shop.id)).length;
+            const td = document.getElementById(`productCount-${shop.id}`);
+            if (td) td.innerHTML = count;
+        });
+    }
+
+    function getShopName(id) {
+        const shop = shops.find(s => String(s.id) === String(id));
+        return shop ? shop.name : "Unknown Shop";
+    }
+
+    // FUNCTION TO FILTER PRODUCTS TABLE
+    function filterProductsList() {
+        const term = document.getElementById("searchProduct").value.toLowerCase().trim();
+        const selectedShop = document.getElementById("productShopFilter").value;
+        
+        document.querySelectorAll("#productsTable tr").forEach(row => {
+            const rowText = row.innerText.toLowerCase();
+            const rowShopId = row.getAttribute("data-shop-id");
+            
+            const matchesSearch = rowText.includes(term);
+            const matchesShop = (selectedShop === "all" || selectedShop === rowShopId);
+            
+            row.style.display = (matchesSearch && matchesShop) ? "" : "none";
+        });
+    }
+
+    document.getElementById("searchProductBtn").addEventListener("click", filterProductsList);
+    document.getElementById("productShopFilter").addEventListener("change", filterProductsList);
+    document.getElementById("searchProduct").addEventListener("input", filterProductsList);
+
+
+    /* ==========================================
+       LOAD LIVE STREAM CLIENT ORDERS
+    ========================================== */
+    function loadOrders() {
+        onSnapshot(collection(db, "orders"), (snapshot) => {
+            orders = [];
+            let pending = 0;
+            let revenue = 0;
+            
+            snapshot.forEach(docSnap => {
+                const order = { id: docSnap.id, ...docSnap.data() };
+                orders.push(order);
+                
+                const currentStatus = getOverallStatus(order);
+                if(currentStatus !== "delivered" && currentStatus !== "cancelled") pending++;
+                if(currentStatus === "delivered") revenue += calculateDynamicTotal(order);
+            });
+
+            // CHRONOLOGICAL DESCENDING SORT
+            orders.sort((a, b) => {
+                let rawA = a.time || a.timestamp || a.createdAt || 0;
+                let rawB = b.time || b.timestamp || b.createdAt || 0;
+                let timeA = isNaN(Number(rawA)) ? new Date(rawA).getTime() : Number(rawA);
+                let timeB = isNaN(Number(rawB)) ? new Date(rawB).getTime() : Number(rawB);
+                return (timeB || 0) - (timeA || 0);
+            });
+            
+            document.getElementById("totalOrders").innerHTML = orders.length;
+            document.getElementById("todayOrders").innerHTML = orders.length;
+            document.getElementById("pendingOrders").innerHTML = pending;
+            document.getElementById("totalRevenue").innerHTML = "₹" + revenue;
+
+            renderAllOrdersToTables();
+            updateCustomersTable();
+            populateAssignmentDropdowns();
+        });
+    }
+
+    function renderAllOrdersToTables() {
+        document.getElementById("dashboardOrdersTable").innerHTML = "";
+        const recentOrders = orders.slice(0, 10);
+        
+        recentOrders.forEach(order => {
+            const shopNames = [...new Set((order.items || []).map(item => getShopName(item.shopId)))];
+            const currentStatus = getOverallStatus(order);
+
+            document.getElementById("dashboardOrdersTable").innerHTML += `
+                <tr>
+                    <td>${order.orderId || order.id.slice(0,6)}</td>
+                    <td>${order.name || "N/A"}</td>
+                    <td>${shopNames.join(", ") || "Unknown"}</td>
+                    <td>${(order.items || []).length}</td>
+                    <td>₹${calculateDynamicTotal(order)}</td>
+                    <td><span class="badge ${getStatusClass(currentStatus)}">${formatStatus(currentStatus)}</span></td>
+                    <td><button class="btn primary" onclick="window.openAndRouteToOrder('${order.id}')">Open</button></td>
+                </tr>
+            `;
+        });
+
+        applyFilters(); 
+    }
+
+    window.openAndRouteToOrder = function(orderId) {
+        window.showPage('orders', document.querySelector('.menu button:nth-child(2)'));
+        window.viewOrder(orderId);
+    };
+
+    /* ==========================================
+       FILTERS PIPELINE FOR RE-RENDERING
+    ========================================== */
+    const searchInput = document.getElementById("searchOrder");
+    const statusSelect = document.getElementById("statusFilter");
+    const shopSelect = document.getElementById("shopFilter");
+    const filterBtn = document.getElementById("applyFilterBtn");
+
+    searchInput.addEventListener("input", applyFilters);
+    statusSelect.addEventListener("change", applyFilters);
+    shopSelect.addEventListener("change", applyFilters);
+    
+    filterBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        statusSelect.value = "all";
+        shopSelect.value = "all";
+        applyFilters();
+    });
+
+    function applyFilters() {
+        const search = searchInput.value.toLowerCase().trim();
+        const status = statusSelect.value;
+        const shop = shopSelect.value;
+        
+        document.getElementById("ordersTable").innerHTML = "";
+        
+        orders.forEach(order => {
+            const searchMatch = String(order.orderId || "").toLowerCase().includes(search) || 
+                                String(order.name || "").toLowerCase().includes(search) || 
+                                String(order.phone || "").toLowerCase().includes(search);
+                                
+            const currentStatus = getOverallStatus(order);
+            const statusMatch = status === "all" || currentStatus === status;
+            
+            const shopMatch = shop === "all" || (order.items || []).some(item => String(item.shopId) === shop);
+            
+            if(searchMatch && statusMatch && shopMatch) {
+                document.getElementById("ordersTable").innerHTML += `
+                    <tr>
+                        <td>${order.orderId || order.id.slice(0,6)}</td>
+                        <td>${order.name || "N/A"}</td>
+                        <td>${order.phone || "N/A"}</td>
+                        <td>${(order.items || []).length}</td>
+                        <td>₹${order.deliveryCharge || 0}</td>
+                        <td>₹${calculateDynamicTotal(order)}</td>
+                        <td><span class="badge ${getStatusClass(currentStatus)}">${formatStatus(currentStatus)}</span></td>
+                        <td><button class="btn primary" onclick="window.viewOrder('${order.id}')">View</button></td>
+                    </tr>
+                `;
+            }
+        });
+    }
+
+    /* ==========================================
+       VIEW SPECIFIC ORDER DETAILS & ACTIONS
+    ========================================== */
+    window.viewOrder = function(orderId) {
+        const order = orders.find(o => o.id === orderId);
+        if(!order) return;
+
+        let html = "";
+        (order.items || []).forEach(item => {
+            const shopStatus = (order.shopStatuses && order.shopStatuses[item.shopId]) ? order.shopStatuses[item.shopId] : 'pending';
+            const isRejected = shopStatus === 'rejected';
+            const isAccepted = shopStatus === 'accepted';
+            
+            const textStyle = isRejected ? "text-decoration: line-through; color: #dc2626; opacity: 0.7;" : "";
+            
+            let statusBadge = "";
+            if (isRejected) {
+                statusBadge = `<span class="badge cancelled" style="font-size:10px; padding:2px 6px; margin-left:8px;">Rejected by Shop</span>`;
+            } else if (isAccepted) {
+                statusBadge = `<span class="badge accepted" style="font-size:10px; padding:2px 6px; margin-left:8px;">Accepted by Shop</span>`;
+            }
+
+            html += `
+                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; ${textStyle}">
+                    <div>
+                        <b>${item.name}</b> ${statusBadge}<br>
+                        <small>Shop : ${getShopName(item.shopId)}</small>
+                    </div>
+                    <div>${item.qty} × ₹${item.price}</div>
+                </div>
+            `;
+        });
+        
+        document.getElementById("productsInOrder").innerHTML = html || "<p>No items found</p>";
+        
+        const currentOverallStatus = getOverallStatus(order);
+        let deleteActionBtnHtml = "";
+        if (currentOverallStatus === "cancelled") {
+            deleteActionBtnHtml = `
+                <button class="btn danger" style="width:100%; margin-top:12px; font-weight:bold;" onclick="window.deleteCancelledOrder('${order.id}')">
+                    🗑 Permanent Purge From Database
+                </button>
+            `;
+        }
+
+        document.getElementById("customerDetails").innerHTML = `
+            <p><b>Name :</b> ${order.name || "N/A"}</p><br>
+            <p><b>Phone :</b> ${order.phone || "N/A"}</p><br>
+            <p><b>Address :</b> ${order.address || "N/A"}</p><br>
+            <p><b>Delivery Charge :</b> ₹${order.deliveryCharge || 0}</p><br>
+            <p><b>Total :</b> ₹${calculateDynamicTotal(order)}</p><br>
+            <p><b>Payment :</b> Cash On Delivery</p><br>
+            
+            <label style="font-weight:600;">Update Pipeline Status (Admin Override)</label>
+            <select id="statusUpdateSelect" style="padding: 10px; border-radius: 6px; width:100%; margin-top:6px; border:1px solid #ccc;">
+                <option value="placed" ${currentOverallStatus === "placed" ? "selected" : ""}>Placed</option>
+                <option value="accepted" ${currentOverallStatus === "accepted" ? "selected" : ""}>Accepted</option>
+                <option value="preparing" ${currentOverallStatus === "preparing" ? "selected" : ""}>Preparing</option>
+                <option value="ready" ${currentOverallStatus === "ready" ? "selected" : ""}>Ready</option>
+                <option value="picked_up" ${currentOverallStatus === "picked_up" ? "selected" : ""}>Picked Up</option>
+                <option value="driver_accepted" ${currentOverallStatus === "driver_accepted" ? "selected" : ""}>Driver Accepted</option>
+                <option value="out_for_delivery" ${currentOverallStatus === "out_for_delivery" ? "selected" : ""}>Out For Delivery</option>
+                <option value="delivered" ${currentOverallStatus === "delivered" ? "selected" : ""}>Delivered</option>
+                <option value="cancelled" ${currentOverallStatus === "cancelled" ? "selected" : ""}>Cancelled</option>
+            </select>
+            <button class="btn primary" style="width:100%; margin-top:10px;" onclick="window.saveOrderStatus('${order.id}')">Apply Supreme Override</button>
+            ${deleteActionBtnHtml}
+        `;
+        
+        document.getElementById("orderDetails").scrollIntoView({ behavior: 'smooth' });
+    };
+
+    /* ==========================================
+       ADMIN SUPREMACY UPDATE (FIXED LOGIC)
+    ========================================== */
+    window.saveOrderStatus = async function(orderId) {
+        const selectEl = document.getElementById("statusUpdateSelect");
+        if(!selectEl) return;
+        
+        const newStatus = selectEl.value;
+        const order = orders.find(o => o.id === orderId);
+        
+        if (!order) return;
+
+        try {
+            const updatePayload = { status: newStatus };
+            
+            if (order.items && order.items.length > 0) {
+                order.items.forEach(item => {
+                    if (item.shopId) {
+                        updatePayload[`shopStatuses.${item.shopId}`] = newStatus;
+                    }
+                });
+            } else if (order.shopIds && order.shopIds.length > 0) {
+                order.shopIds.forEach(shopId => {
+                    updatePayload[`shopStatuses.${shopId}`] = newStatus;
+                });
+            }
+
+            if (newStatus === "cancelled") {
+                updatePayload.deliveryBoy = null;
+            }
+
+            await updateDoc(doc(db, "orders", orderId), updatePayload);
+            alert(`Supreme Override Applied: Order updated to '${newStatus}' across all platforms!`);
+            
+        } catch(e) {
+            console.error(e);
+            alert("Failed to execute supreme override document update.");
+        }
+    };
+
+    window.deleteCancelledOrder = async function(orderId) {
+        if(!confirm("Are you sure you want to permanently delete this cancelled order record from Firestore?")) return;
+        try {
+            await deleteDoc(doc(db, "orders", orderId));
+            alert("Cancelled order record purged from system database successfully.");
+            document.getElementById("productsInOrder").innerHTML = "Select an order from the list above.";
+            document.getElementById("customerDetails").innerHTML = "Select an order from the list above.";
+        } catch(error) {
+            console.error("Purge Error: ", error);
+            alert("Failed to delete record.");
+        }
+    };
+
+    /* ==========================================
+       DELIVERY PARTNERS PIPELINE
+    ========================================== */
+    // CREATE DELIVERY PARTNER
+    document.getElementById("createDeliveryBtn").addEventListener("click", async () => {
+        const name = document.getElementById("newDeliveryName").value;
+        const phone = document.getElementById("newDeliveryPhone").value;
+        const loginId = document.getElementById("newDeliveryLogin").value;
+        const pass = document.getElementById("newDeliveryPass").value;
+
+        if(!name || !phone || !loginId || !pass) return alert("Please fill all details.");
+
+        try {
+            await addDoc(collection(db, "delivery_partners"), {
+                name, phone, loginId, password: pass, status: "offline", currentOrderId: ""
+            });
+            alert("Delivery Partner created!");
+            document.getElementById("newDeliveryName").value = "";
+            document.getElementById("newDeliveryPhone").value = "";
+            document.getElementById("newDeliveryLogin").value = "";
+            document.getElementById("newDeliveryPass").value = "";
+        } catch(e) { console.error(e); alert("Error creating partner."); }
+    });
+    
+    // DELETE DELIVERY PARTNER
+    window.deleteDeliveryPartner = async function(partnerId) {
+        if(confirm("Delete this delivery partner account?")) await deleteDoc(doc(db, "delivery_partners", partnerId));
+    };
+
+    function loadDeliveryPartners() {
+        onSnapshot(collection(db, "delivery_partners"), (snapshot) => {
+            deliveryPartners = [];
+            document.getElementById("deliveryTable").innerHTML = "";
+            
+            snapshot.forEach(docSnap => {
+                const partner = { id: docSnap.id, ...docSnap.data() };
+                deliveryPartners.push(partner);
+                
+                document.getElementById("deliveryTable").innerHTML += `
+                    <tr>
+                        <td>${partner.name || "-"}</td>
+                        <td>${partner.phone || "-"}</td>
+                        <td>${partner.loginId || "-"}</td>
+                        <td><span class="badge ${partner.status === 'active' ? 'accepted' : 'cancelled'}">${partner.status || 'offline'}</span></td>
+                        <td>${partner.currentOrderId || "None"}</td>
+                        <td><button class="btn danger" onclick="deleteDeliveryPartner('${partner.id}')">Delete</button></td>
+                    </tr>
+                `;
+            });
+            populateAssignmentDropdowns();
+        });
+    }
+
+    function populateAssignmentDropdowns() {
+        const orderSelect = document.getElementById("assignOrderSelect");
+        const partnerSelect = document.getElementById("assignPartnerSelect");
+        
+        if(!orderSelect || !partnerSelect) return;
+        
+        orderSelect.innerHTML = '<option value="">Select Order</option>';
+        orders.forEach(o => {
+            const currentStatus = getOverallStatus(o);
+            if(currentStatus !== "delivered" && currentStatus !== "cancelled") {
+                orderSelect.innerHTML += `<option value="${o.id}">${o.orderId || o.id.slice(0,6)} - ${o.name || 'Guest'}</option>`;
+            }
+        });
+
+        partnerSelect.innerHTML = '<option value="">Select Delivery Partner</option>';
+        deliveryPartners.forEach(p => {
+            partnerSelect.innerHTML += `<option value="${p.id}">${p.name} (${p.status || 'offline'})</option>`;
+        });
+    }
+
+    document.getElementById("assignDeliveryBtn").addEventListener("click", async () => {
+        const orderId = document.getElementById("assignOrderSelect").value;
+        const partnerId = document.getElementById("assignPartnerSelect").value;
+        
+        if(!orderId || !partnerId) {
+            alert("Please pick both an order document and an online partner driver profile.");
+            return;
+        }
+        try {
+            await updateDoc(doc(db, "orders", orderId), { deliveryPartnerId: partnerId, status: "preparing" });
+            await updateDoc(doc(db, "delivery_partners", partnerId), { currentOrderId: orderId });
+            alert("Delivery Partner assigned to active shipment processing successfully!");
+        } catch(e) {
+            console.error(e);
+            alert("Assignment sync write mismatch failure.");
+        }
+    });
+
+    /* ==========================================
+       DYNAMIC CUSTOMER COMPUTED SPENDING LOGIC
+    ========================================== */
+    function updateCustomersTable() {
+        const customerMap = {};
+        orders.forEach(order => {
+            const phoneKey = order.phone || "Unknown Phone";
+            if(!customerMap[phoneKey]) {
+                customerMap[phoneKey] = {
+                    name: order.name || "Guest Checkout",
+                    phone: phoneKey,
+                    totalOrders: 0,
+                    totalSpending: 0,
+                    lastOrder: order.time || 0
+                };
+            }
+            customerMap[phoneKey].totalOrders++;
+            if(getOverallStatus(order) === "delivered") {
+                customerMap[phoneKey].totalSpending += calculateDynamicTotal(order);
+            }
+        });
+        
+        document.getElementById("customersTable").innerHTML = "";
+        Object.values(customerMap).forEach(c => {
+            let dateStr = c.lastOrder ? new Date(c.lastOrder).toLocaleDateString() : "-";
+            document.getElementById("customersTable").innerHTML += `
+                <tr>
+                    <td>${c.name}</td>
+                    <td>${c.phone}</td>
+                    <td>${c.totalOrders}</td>
+                    <td><b>₹${c.totalSpending}</b></td>
+                    <td>${dateStr}</td>
+                </tr>
+            `;
+        });
+    }
+
+    /* ==========================================
+       PLATFORM CONFIG SETTINGS CONTROLLER
+    ========================================== */
+    document.getElementById("saveSettingsBtn").addEventListener("click", async () => {
+        const charge = document.getElementById("deliveryCharge").value;
+        const name = document.getElementById("platformName").value;
+        try {
+            await updateDoc(doc(db, "settings", "platform"), {
+                defaultDeliveryCharge: Number(charge),
+                platformName: name
+            });
+            alert("Settings configurations saved successfully inside cloud bucket instance documents.");
+        } catch(e) {
+            alert("Configuration fallback applied locally for this workspace session panel.");
+        }
+    });
+
+    /* ==========================================
+       MANUAL INTERACTION ELEMENT HOOKS
+    ========================================== */
+    document.getElementById("refreshDashboardBtn").addEventListener("click", () => loadOrders());
+    document.getElementById("refreshShopsBtn").addEventListener("click", () => loadShops());
+    document.getElementById("refreshDeliveryBtn").addEventListener("click", () => loadDeliveryPartners());
+    document.getElementById("refreshCustomersBtn").addEventListener("click", () => updateCustomersTable());
+    
 </script>
-
 </body>
 </html>

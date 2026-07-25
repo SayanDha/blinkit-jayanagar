@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Dashboard | Login</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+body { background: #eef2f7; }
+
+/* HEADER */
+header { background: #27374D; color: white; text-align: center; padding: 18px; font-size: 24px; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,.2); display: flex; justify-content: space-between; align-items: center; }
+.logoutBtn { background: #f44336; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; display: none; }
+
+/* LOGIN SCREEN */
+#loginScreen { height: 100vh; display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; background: #27374D; z-index: 1000; }
+.loginBox { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,.2); }
+.loginBox h2 { margin-bottom: 25px; color: #333; }
+.loginBox input { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+.loginBox button { width: 100%; padding: 14px; background: #3498db; border: none; color: white; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+
+/* CONTAINER & DASHBOARD */
+.container { width: 95%; max-width: 1500px; margin: 25px auto; display: none; }
+.dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 25px; }
+.statCard { background: white; border-radius: 12px; padding: 25px; text-align: center; box-shadow: 0 5px 12px rgba(0,0,0,.08); }
+.statCard h3 { color: #666; margin-bottom: 15px; font-size: 20px; }
+.statCard h1 { font-size: 42px; color: #222; }
+.total { border-top: 6px solid #3498db; }
+.pending { border-top: 6px solid orange; }
+
+/* SECTIONS */
+.section { background: white; border-radius: 12px; padding: 22px; margin-bottom: 30px; box-shadow: 0 5px 12px rgba(0,0,0,.08); }
+.section h2 { margin-bottom: 20px; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+/* INVENTORY SYSTEM */
+.inventoryGrid { display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+.addForm input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; }
+.addForm button { width: 100%; padding: 12px; background: #2ecc71; border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.productTable { width: 100%; border-collapse: collapse; }
+.productTable th, .productTable td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+.productTable th { background: #f9f9f9; }
+.stockCtrl { display: flex; gap: 10px; align-items: center; }
+.stockCtrl button { padding: 5px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.btnMinus { background: #f44336; color: white; }
+.btnPlus { background: #3498db; color: white; }
+
+/* ORDER CARDS */
+.orderCard { border-left: 6px solid orange; background: #fafafa; border-radius: 10px; padding: 22px; margin-bottom: 20px; }
+.top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.orderId { font-size: 24px; font-weight: bold; }
+.statusPlaced { background: #ff9800; color: white; padding: 8px 18px; border-radius: 20px; font-weight: bold;}
+.statusAccepted { background: #4CAF50; color: white; padding: 8px 18px; border-radius: 20px; font-weight: bold;}
+.itemBox { margin-top: 10px; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; }
+.buttonRow { display: flex; gap: 15px; margin-top: 20px; }
+.acceptBtn { background: #4CAF50; padding: 12px 25px; border: none; color: white; border-radius: 8px; cursor: pointer; }
+.rejectBtn { background: #f44336; padding: 12px 25px; border: none; color: white; border-radius: 8px; cursor: pointer; }
+
+@media(max-width:800px){ .inventoryGrid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+    <div class="loginBox">
+        <h2>🏪 Shop Partner Login</h2>
+        <input type="text" id="loginIdInput" placeholder="Enter Login ID">
+        <input type="password" id="passwordInput" placeholder="Enter Password">
+        <button id="loginBtn">Login securely</button>
+    </div>
+</div>
+
+<header>
+    <span id="shopHeaderName">🏪 Shop Dashboard</span>
+    <button id="logoutBtn" class="logoutBtn" onclick="location.reload()">Logout</button>
+</header>
+
+<div class="container" id="mainContainer">
+    <div class="dashboard">
+        <div class="statCard total">
+            <h3>Total Orders</h3>
+            <h1 id="totalOrders">0</h1>
+        </div>
+        <div class="statCard pending">
+            <h3>Pending Orders</h3>
+            <h1 id="pendingOrders">0</h1>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🛒 My Inventory & Products</h2>
+        <div class="inventoryGrid">
+            
+            <div class="addForm" style="background:#fafafa; padding:20px; border-radius:8px; border:1px solid #ddd;">
+                <h3 style="margin-bottom:15px; color:#333;">Add New Product</h3>
+                <input type="text" id="prodName" placeholder="Product Name (e.g. Apple)">
+                <input type="number" id="prodPrice" placeholder="Selling Price (₹)">
+                <input type="number" id="prodStock" placeholder="Initial Stock Quantity">
+                <input type="text" id="prodImage" placeholder="Image URL (Optional)">
+                <button id="addProductBtn">➕ Add Product to Store</button>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="productTable">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Price</th>
+                            <th>Current Stock</th>
+                            <th>Update Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryTable">
+                        <tr><td colspan="4" style="text-align:center;">Loading inventory...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🟡 New Pending Orders</h2>
+        <div id="pendingContainer">
+            <div style="text-align:center; padding:20px; color:#777;">No new orders right now.</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🟢 Accepted Orders Processing</h2>
+        <div id="acceptedContainer">
+            <div style="text-align:center; padding:20px; color:#777;">No active orders.</div>
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, getDocs, updateDoc, onSnapshot, query, where, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBEgVRjqj5SshWvkUsM2pPbPs6dMP77wAw",
+    authDomain: "jayanagar-delivery.firebaseapp.com",
+    projectId: "jayanagar-delivery",
+    storageBucket: "jayanagar-delivery.firebasestorage.app",
+    messagingSenderId: "460592006643",
+    appId: "1:460592006643:web:998daeb371e9e342043e86",
+    measurementId: "G-7L7T72ENL1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let MY_SHOP_ID = "";
+let MY_SHOP_NAME = "";
+let shopProducts = [];
+let rawOrdersSnapshot = []; 
+
+// ==========================================
+// LOGIN SYSTEM
+// ==========================================
+document.getElementById("loginBtn").addEventListener("click", async () => {
+    const loginId = document.getElementById("loginIdInput").value.trim();
+    const password = document.getElementById("passwordInput").value.trim();
+
+    if(!loginId || !password) return alert("Please enter both ID and Password");
+    
+    document.getElementById("loginBtn").innerText = "Authenticating...";
+
+    try {
+        const q = query(collection(db, "shops"), where("loginId", "==", loginId), where("password", "==", password));
+        const snapshot = await getDocs(q);
+
+        if(snapshot.empty) {
+            alert("Invalid Credentials. Check your Login ID and Password.");
+            document.getElementById("loginBtn").innerText = "Login securely";
+            return;
+        }
+
+        // Login Success
+        snapshot.forEach(docSnap => {
+            MY_SHOP_ID = docSnap.id;
+            MY_SHOP_NAME = docSnap.data().name;
+        });
+
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainContainer").style.display = "block";
+        document.getElementById("logoutBtn").style.display = "block";
+        document.getElementById("shopHeaderName").innerText = "🏪 Dashboard: " + MY_SHOP_NAME;
+
+        // Load specific shop data
+        startInventoryListener();
+        listenToAllPlatformOrders();
+
+    } catch (e) {
+        console.error(e);
+        alert("Server error during login.");
+        document.getElementById("loginBtn").innerText = "Login securely";
+    }
+});
+
+
+// ==========================================
+// INVENTORY MANAGEMENT SYSTEM (CRUD)
+// ==========================================
+function startInventoryListener() {
+    const q = query(collection(db, "products"), where("shopId", "==", MY_SHOP_ID));
+    onSnapshot(q, (snapshot) => {
+        shopProducts = [];
+        document.getElementById("inventoryTable").innerHTML = "";
+
+        if(snapshot.empty) {
+            document.getElementById("inventoryTable").innerHTML = '<tr><td colspan="4" style="text-align:center;">Your inventory is empty. Add a product!</td></tr>';
+            return;
+        }
+
+        snapshot.forEach(docSnap => {
+            const prod = { id: docSnap.id, ...docSnap.data() };
+            shopProducts.push(prod);
+            
+            document.getElementById("inventoryTable").innerHTML += `
+                <tr>
+                    <td><b>${prod.name}</b></td>
+                    <td>₹${prod.price}</td>
+                    <td style="font-size:18px; font-weight:bold;">${prod.stock}</td>
+                    <td>
+                        <div class="stockCtrl">
+                            <button class="btnMinus" onclick="updateStock('${prod.id}', -1)">-</button>
+                            <span>Stock</span>
+                            <button class="btnPlus" onclick="updateStock('${prod.id}', 1)">+</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+    });
+}
+
+document.getElementById("addProductBtn").addEventListener("click", async () => {
+    const name = document.getElementById("prodName").value;
+    const price = Number(document.getElementById("prodPrice").value);
+    const stock = Number(document.getElementById("prodStock").value);
+    const image = document.getElementById("prodImage").value || "https://placehold.co/100";
+
+    if(!name || !price || isNaN(stock)) return alert("Please fill all product fields correctly.");
+
+    try {
+        await addDoc(collection(db, "products"), {
+            name: name,
+            price: price,
+            stock: stock,
+            image: image,
+            shopId: MY_SHOP_ID
+        });
+        alert("Product Added Successfully!");
+        document.getElementById("prodName").value = "";
+        document.getElementById("prodPrice").value = "";
+        document.getElementById("prodStock").value = "";
+    } catch(e) {
+        alert("Failed to add product.");
+        console.error(e);
+    }
+});
+
+window.updateStock = async function(productId, change) {
+    const product = shopProducts.find(p => p.id === productId);
+    if(!product) return;
+
+    let newStock = product.stock + change;
+    if(newStock < 0) newStock = 0; // Prevent negative stock
+
+    try {
+        await updateDoc(doc(db, "products", productId), { stock: newStock });
+    } catch(e) {
+        alert("Error updating stock");
+    }
+}
+
+// ==========================================
+// ORDER LISTENER SYSTEM
+// ==========================================
+function listenToAllPlatformOrders() {
+    const q = query(collection(db, "orders"), orderBy("time", "desc"));
+    
+    onSnapshot(q, (snapshot) => {
+        rawOrdersSnapshot = [];
+        snapshot.forEach(docSnap => {
+            rawOrdersSnapshot.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        processAndRenderOrders();
+    });
+}
+
+function processAndRenderOrders() {
+    let pending = [], accepted = [];
+    
+    rawOrdersSnapshot.forEach(order => {
+        if (!order.shopIds || !order.shopIds.includes(MY_SHOP_ID)) return;
+
+        const shopItems = (order.items || []).filter(item => String(item.shopId) === MY_SHOP_ID);
+        if (shopItems.length === 0) return;
+
+        let myStatus = "placed";
+        if (order.shopStatuses && order.shopStatuses[MY_SHOP_ID]) {
+            myStatus = order.shopStatuses[MY_SHOP_ID];
+        }
+
+        order.shopItems = shopItems;
+
+        if (myStatus === "placed") pending.push(order);
+        else if (myStatus === "accepted") accepted.push(order);
+    });
+
+    document.getElementById("totalOrders").innerText = pending.length + accepted.length;
+    document.getElementById("pendingOrders").innerText = pending.length;
+
+    renderOrdersList("pendingContainer", pending, true);
+    renderOrdersList("acceptedContainer", accepted, false);
+}
+
+function renderOrdersList(containerId, list, showActions) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+    if (list.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#777;">No orders here.</div>';
+        return;
+    }
+
+    list.forEach(order => {
+        let itemsHTML = order.shopItems.map(i => `<li>${i.name} × ${i.qty}</li>`).join("");
+        
+        container.innerHTML += `
+            <div class="orderCard">
+                <div class="top">
+                    <div class="orderId">${order.orderId || order.id.slice(0,6)}</div>
+                    <div class="${showActions ? 'statusPlaced' : 'statusAccepted'}">${showActions ? 'PENDING' : 'ACCEPTED'}</div>
+                </div>
+                <div><b>Customer:</b> ${order.name || 'Guest'}</div>
+                <div class="itemBox"><ul>${itemsHTML}</ul></div>
+                ${showActions ? `
+                <div class="buttonRow">
+                    <button class="acceptBtn" onclick="acceptOrder('${order.id}')">✅ Accept</button>
+                    <button class="rejectBtn" onclick="rejectOrder('${order.id}')">❌ Reject</button>
+                </div>
+                ` : ''}
+            </div>
+        `;
+    });
+}
+
+window.acceptOrder = async function(orderDocId) {
+    try {
+        const payload = {};
+        payload[`shopStatuses.${MY_SHOP_ID}`] = "accepted";
+        await updateDoc(doc(db, "orders", orderDocId), payload);
+    } catch(e) { alert("Failed to accept."); }
+};
+
+window.rejectOrder = async function(orderDocId) {
+    if(!confirm("Are you sure you want to cancel your part of this order?")) return;
+    try {
+        const payload = {};
+        payload[`shopStatuses.${MY_SHOP_ID}`] = "rejected";
+        await updateDoc(doc(db, "orders", orderDocId), payload);
+    } catch(e) { alert("Failed to reject."); }
+};
+</script>
+</body>
+</html>
