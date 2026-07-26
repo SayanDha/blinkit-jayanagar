@@ -355,7 +355,7 @@ function updateCartUI() {
     return `<li>${i.name} × ${i.qty} = ₹${i.qty * i.price}</li>`;
   }).join("");
 
-  const deliveryCharge = 20;
+  const deliveryCharge = 30;
   list.innerHTML += `<li style="margin-top:10px;color:#1565c0">Delivery Charge = ₹${deliveryCharge}</li>`;
   document.getElementById("total").textContent = subtotal + deliveryCharge;
 }
