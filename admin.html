@@ -15,6 +15,14 @@
         body { background: var(--bg); overflow-x: hidden; }
         .wrapper { display: flex; min-height: 100vh; }
         
+        /* ADMIN LOGIN OVERLAY */
+        #adminLoginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--sidebar); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .loginBox { background: white; padding: 40px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,.2); }
+        .loginBox h2 { margin-bottom: 25px; color: var(--text); font-weight: 600; }
+        .loginBox p { margin-bottom: 20px; color: #666; font-size: 14px; }
+        .loginBox input { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; font-size: 16px; outline: none; }
+        .loginBox input:focus { border-color: var(--primary); }
+        
         /* SIDEBAR */
         .sidebar { width: 260px; background: var(--sidebar); color: white; position: fixed; left: 0; top: 0; bottom: 0; overflow-y: auto; }
         .logo { padding: 24px; font-size: 24px; font-weight: 700; text-align: center; border-bottom: 1px solid rgba(255,255,255,.08); }
@@ -22,17 +30,17 @@
         .menu { padding: 20px 0; }
         .menu button { width: 100%; padding: 16px 28px; border: none; background: none; color: white; cursor: pointer; text-align: left; font-size: 15px; transition: .25s; display: flex; align-items: center; gap: 12px; }
         .menu button:hover { background: var(--sidebarHover); }
-        .menu button.active { background: var(--primary); }
+        .menu button.active { background: var(--primary); border-left: 4px solid #60a5fa; }
         
         /* MAIN */
         .main { margin-left: 260px; width: calc(100% - 260px); }
         
         /* HEADER */
         .header { background: white; padding: 20px 35px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,.05); position: sticky; top: 0; z-index: 50; }
-        .header h2 { font-size: 28px; color: var(--text); }
+        .header h2 { font-size: 24px; color: var(--text); font-weight: 600;}
         .headerRight { display: flex; align-items: center; gap: 15px; }
-        .adminBadge { padding: 8px 16px; background: #dcfce7; color: var(--green); font-weight: 600; border-radius: 30px; }
-        .logoutBtn { padding: 10px 18px; background: var(--red); border: none; color: white; border-radius: 8px; cursor: pointer; }
+        .adminBadge { padding: 8px 16px; background: #dcfce7; color: var(--green); font-weight: 600; border-radius: 30px; font-size: 14px;}
+        .logoutBtn { padding: 10px 18px; background: var(--red); border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: 500;}
         
         /* CONTENT & CARDS */
         .content { padding: 30px; }
@@ -48,24 +56,26 @@
         /* SECTIONS & FILTERS */
         .section { margin-top: 30px; background: white; padding: 24px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
         .sectionTitle { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .sectionTitle h2 { font-size: 22px; color: var(--text); }
+        .sectionTitle h2 { font-size: 20px; color: var(--text); font-weight: 600;}
         .filterBar { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 15px; margin-bottom: 20px; }
-        .filterBar input, .filterBar select { padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; }
+        .filterBar input, .filterBar select { padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; outline: none;}
         
         /* BUTTONS & TABLES */
-        .btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; text-align: center; }
+        .btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; text-align: center; font-weight: 600; transition: .2s;}
         .primary { background: var(--primary); color: white; }
+        .primary:hover { background: var(--primaryDark); }
         .success { background: var(--green); color: white; }
         .warning { background: var(--orange); color: white; }
         .danger { background: var(--red); color: white; }
-        .tableWrapper { overflow: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th { background: #eef4ff; padding: 14px; text-align: left; }
-        td { padding: 14px; border-bottom: 1px solid #eee; }
-        tr:hover { background: #fafafa; }
+        
+        .tableWrapper { overflow: auto; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; min-width: 700px;}
+        th { background: #f8fafc; padding: 16px; text-align: left; font-size: 14px; color: #475569; font-weight: 600; border-bottom: 2px solid var(--border);}
+        td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #334155;}
+        tr:hover { background: #f8fafc; }
         
         /* STATUS BADGES */
-        .badge { padding: 6px 12px; border-radius: 30px; font-size: 13px; font-weight: 600; display: inline-block; }
+        .badge { padding: 6px 12px; border-radius: 30px; font-size: 12px; font-weight: 600; display: inline-block; text-align: center;}
         .pending { background: #fff3cd; color: #946200; }
         .accepted { background: #d1f7dd; color: #146c43; }
         .preparing { background: #dbeafe; color: #1d4ed8; }
@@ -76,12 +86,13 @@
         
         /* ORDER DETAILS */
         .orderDetails { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
-        .box { border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-        .box h3 { margin-bottom: 15px; color: var(--text); }
+        .box { border: 1px solid var(--border); border-radius: 12px; padding: 20px; background: #fafafa;}
+        .box h3 { margin-bottom: 15px; color: var(--text); font-size: 16px;}
 
         /* FORM GRID FOR CREATION */
         .formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .formInput { padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; width: 100%; }
+        .formInput { padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; width: 100%; outline: none; }
+        .formInput:focus { border-color: var(--primary); }
         
         /* RESPONSIVE */
         @media(max-width: 950px){
@@ -99,7 +110,18 @@
 </head>
 <body>
 
+<!-- ADMIN LOGIN OVERLAY -->
+<div id="adminLoginScreen">
+    <div class="loginBox">
+        <h2>🔒 Admin Security Log In</h2>
+        <p>Please enter your master password to access the panel.</p>
+        <input type="password" id="adminPassword" placeholder="Enter Admin Password">
+        <button class="btn primary" style="width: 100%; padding: 14px; font-size: 16px;" onclick="verifyAdmin()">Unlock Dashboard</button>
+    </div>
+</div>
+
 <div class="wrapper">
+    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="logo">JQD <span>Admin</span></div>
         <div class="menu">
@@ -108,21 +130,23 @@
             <button onclick="window.showPage('shops', this)">🏪 Shops</button>
             <button onclick="window.showPage('products', this)">🛒 Products</button>
             <button onclick="window.showPage('delivery', this)">🚚 Delivery</button>
-            <button onclick="window.showPage('customers', this)">👤 Customers</button>
+            <button onclick="window.showPage('customers', this)">👥 Users & Registrations</button>
             <button onclick="window.showPage('settings', this)">⚙ Settings</button>
         </div>
     </div>
 
+    <!-- MAIN CONTENT -->
     <div class="main">
         <div class="header">
             <h2>Platform Admin Dashboard</h2>
             <div class="headerRight">
                 <div class="adminBadge">🟢 System Online</div>
-                <button class="logoutBtn" onclick="alert('Admin Session Closed')">Logout</button>
+                <button class="logoutBtn" onclick="location.reload()">Logout</button>
             </div>
         </div>
 
         <div class="content">
+            <!-- DASHBOARD PAGE -->
             <div id="dashboardPage">
                 <div class="cards">
                     <div class="card blue">
@@ -167,6 +191,7 @@
                 </div>
             </div>
 
+            <!-- ORDERS PAGE -->
             <div id="ordersPage" class="hidden">
                 <div class="section">
                     <div class="sectionTitle">
@@ -224,6 +249,7 @@
                 </div>
             </div>
 
+            <!-- SHOPS PAGE -->
             <div id="shopsPage" class="hidden">
                 <div class="section">
                     <div class="sectionTitle"><h2>Register New Shop</h2></div>
@@ -260,6 +286,7 @@
                 </div>
             </div>
 
+            <!-- PRODUCTS PAGE -->
             <div id="productsPage" class="hidden">
                 <div class="section">
                     <div class="sectionTitle"><h2>Add Product to Shop</h2></div>
@@ -305,6 +332,7 @@
                 </div>
             </div>
 
+            <!-- DELIVERY PARTNERS PAGE -->
             <div id="deliveryPage" class="hidden">
                 <div class="section">
                     <div class="sectionTitle"><h2>Register Delivery Partner</h2></div>
@@ -352,29 +380,54 @@
                 </div>
             </div>
 
+            <!-- REGISTERED USERS PAGE (NEW & ALL USERS) -->
             <div id="customersPage" class="hidden">
-                <div class="section">
+                <!-- Section 1: New Users -->
+                <div class="section" style="border-left: 4px solid var(--orange);">
                     <div class="sectionTitle">
-                        <h2>Customers</h2>
-                        <button class="btn primary" id="refreshCustomersBtn">Refresh</button>
+                        <h2>🆕 New User Registrations (Pending Review)</h2>
+                        <button class="btn primary" onclick="loadUsers()">Refresh Data</button>
                     </div>
                     <div class="tableWrapper">
                         <table>
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Phone</th>
-                                    <th>Total Orders</th>
-                                    <th>Total Spending</th>
-                                    <th>Last Order</th>
+                                    <th>Phone Number</th>
+                                    <th>Email Address</th>
+                                    <th>Delivery Address</th>
+                                    <th>Date Registered</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="customersTable"></tbody>
+                            <tbody id="newUsersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Section 2: All Users -->
+                <div class="section">
+                    <div class="sectionTitle">
+                        <h2>👥 All Registered Users</h2>
+                    </div>
+                    <div class="tableWrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Phone Number</th>
+                                    <th>Email Address</th>
+                                    <th>Delivery Address</th>
+                                    <th>Date Registered</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allUsersTable"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
+            <!-- SETTINGS PAGE -->
             <div id="settingsPage" class="hidden">
                 <div class="section">
                     <div class="sectionTitle"><h2>Platform Settings</h2></div>
@@ -409,16 +462,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { 
-        getFirestore, 
-        collection, 
-        doc, 
-        getDocs, 
-        getDoc, 
-        onSnapshot, 
-        query, 
-        updateDoc, 
-        deleteDoc,
-        addDoc
+        getFirestore, collection, doc, getDocs, getDoc, onSnapshot, query, updateDoc, deleteDoc, addDoc
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -438,6 +482,26 @@
     let shops = [];
     let products = [];
     let deliveryPartners = [];
+    let allRegisteredUsers = [];
+
+    /* ==========================================
+       ADMIN SECURITY LOGIN
+    ========================================== */
+    window.verifyAdmin = function() {
+        const pass = document.getElementById("adminPassword").value;
+        // Verify against the hardcoded Master Password
+        if (pass === "admin123") {
+            document.getElementById("adminLoginScreen").style.display = "none";
+            loadDashboard(); // Start loading data only after successful login
+        } else {
+            alert("Incorrect Admin Password! (Hint: admin123)");
+        }
+    };
+
+    // Press Enter to login
+    document.getElementById("adminPassword").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") { event.preventDefault(); window.verifyAdmin(); }
+    });
 
     /* ==========================================
        DYNAMIC PRICE CALCULATION LOGIC
@@ -447,7 +511,6 @@
         if (order.items && order.items.length > 0) {
             order.items.forEach(item => {
                 const shopStatus = (order.shopStatuses && order.shopStatuses[item.shopId]) ? order.shopStatuses[item.shopId] : 'pending';
-                // Only count the item if the shop hasn't rejected it
                 if (shopStatus !== 'rejected') {
                     itemTotal += (Number(item.price) * Number(item.qty));
                 }
@@ -462,16 +525,9 @@
     /* ==========================================
        STATUS CSS CLASS MAPPER & RESOLVER
     ========================================== */
-    
-    // NEW: Resolve the overall status of a multi-vendor order based on individual shop responses
     function getOverallStatus(order) {
-        // If master status has been manually progressed beyond basic states, respect it
         const advancedStatuses = ['preparing', 'ready', 'picked_up', 'driver_accepted', 'out_for_delivery', 'delivered', 'cancelled'];
-        if (advancedStatuses.includes(order.status)) {
-            return order.status;
-        }
-        
-        // Otherwise, dynamically determine status from individual shop responses
+        if (advancedStatuses.includes(order.status)) return order.status;
         if (order.shopStatuses && Object.keys(order.shopStatuses).length > 0) {
             const statuses = Object.values(order.shopStatuses);
             if (statuses.includes('accepted')) return 'accepted';
@@ -483,15 +539,9 @@
     function getStatusClass(status) {
         const s = (status || "").toLowerCase();
         const map = {
-            "placed": "pending",
-            "accepted": "accepted",
-            "preparing": "preparing",
-            "ready": "ready",
-            "picked_up": "picked",
-            "out_for_delivery": "preparing",
-            "delivered": "delivered",
-            "cancelled": "cancelled",
-            "assigned": "preparing", 
+            "placed": "pending", "accepted": "accepted", "preparing": "preparing",
+            "ready": "ready", "picked_up": "picked", "out_for_delivery": "preparing",
+            "delivered": "delivered", "cancelled": "cancelled", "assigned": "preparing", 
             "driver_accepted": "accepted" 
         };
         return map[s] || "pending";
@@ -506,30 +556,24 @@
        SIDEBAR INTERACTION PAGE ROUTING
     ========================================== */
     window.showPage = function(pageId, btnElement) {
-        document.querySelectorAll('.content > div').forEach(div => {
-            div.classList.add('hidden');
-        });
-        
+        document.querySelectorAll('.content > div').forEach(div => div.classList.add('hidden'));
         const targetPage = document.getElementById(pageId + 'Page');
         if (targetPage) targetPage.classList.remove('hidden');
 
-        document.querySelectorAll('.menu button').forEach(btn => {
-            btn.classList.remove('active');
-        });
+        document.querySelectorAll('.menu button').forEach(btn => btn.classList.remove('active'));
         if (btnElement) btnElement.classList.add('active');
     };
 
     /* ==========================================
        INITIAL RUN HANDLER
     ========================================== */
-    loadDashboard();
-
     async function loadDashboard() {
         try {
             await loadShops(); 
             loadOrders();
             loadProducts();
             loadDeliveryPartners();
+            window.loadUsers(); // Fetch Registered Users Automatically
         } catch(error) {
             console.error("Error connecting to Firebase:", error);
             alert("Could not load data. Please check your connection rules.");
@@ -539,7 +583,6 @@
     /* ==========================================
        LOAD & CREATE SHOPS PIPELINE
     ========================================== */
-    // CREATE SHOP
     document.getElementById("createShopBtn").addEventListener("click", async () => {
         const name = document.getElementById("newShopName").value;
         const owner = document.getElementById("newShopOwner").value;
@@ -561,7 +604,6 @@
         } catch(e) { console.error(e); alert("Error creating shop."); }
     });
 
-    // DELETE SHOP
     window.deleteShop = async function(shopId) {
         if(!confirm("Are you sure you want to delete this shop entirely?")) return;
         try {
@@ -571,16 +613,12 @@
         } catch(e) { alert("Error deleting shop."); }
     };
 
-    // GO TO SHOP PRODUCTS
     window.openShopProducts = function(shopId) {
         const productsBtn = document.querySelectorAll('.menu button')[3]; 
         window.showPage('products', productsBtn);
-        
         document.getElementById("productShopFilter").value = shopId;
         document.getElementById("adminProdShopSelect").value = shopId;
-        
         filterProductsList();
-        document.getElementById("adminProdName").focus();
     };
 
     async function loadShops() {
@@ -594,7 +632,6 @@
         snapshot.forEach(docSnap => {
             const shop = { id: docSnap.id, ...docSnap.data() };
             shops.push(shop);
-            
             document.getElementById("shopFilter").innerHTML += `<option value="${shop.id}">${shop.name}</option>`;
             document.getElementById("productShopFilter").innerHTML += `<option value="${shop.id}">${shop.name}</option>`;
             document.getElementById("adminProdShopSelect").innerHTML += `<option value="${shop.id}">${shop.name}</option>`;
@@ -606,12 +643,8 @@
                     <td>${shop.loginId || "-"}</td>
                     <td id="productCount-${shop.id}">0</td>
                     <td><span class="badge accepted">Online</span></td>
-                    <td>
-                        <button class="btn primary" onclick="openShopProducts('${shop.id}')">📦 Manage Products</button>
-                    </td>
-                    <td>
-                        <button class="btn danger" onclick="deleteShop('${shop.id}')">Delete</button>
-                    </td>
+                    <td><button class="btn primary" onclick="openShopProducts('${shop.id}')">📦 Manage</button></td>
+                    <td><button class="btn danger" onclick="deleteShop('${shop.id}')">Delete</button></td>
                 </tr>
             `;
         });
@@ -619,9 +652,8 @@
     }
 
     /* ==========================================
-       LOAD & CREATE PRODUCTS DATA STREAM
+       PRODUCTS & INVENTORY
     ========================================== */
-    // ADMIN ADD PRODUCT
     document.getElementById("adminAddProdBtn").addEventListener("click", async () => {
         const name = document.getElementById("adminProdName").value;
         const price = Number(document.getElementById("adminProdPrice").value);
@@ -630,52 +662,34 @@
         const shopId = document.getElementById("adminProdShopSelect").value;
 
         if(!name || !price || !shopId) return alert("Please fill Name, Price, and Select a Shop.");
-
         try {
-            await addDoc(collection(db, "products"), {
-                name: name, price: price, stock: stock || 0, shopId: shopId, image: image
-            });
+            await addDoc(collection(db, "products"), { name, price, stock: stock || 0, shopId, image });
             alert("Product added successfully to shop!");
-            document.getElementById("adminProdName").value = "";
-            document.getElementById("adminProdPrice").value = "";
-            document.getElementById("adminProdStock").value = "";
-            document.getElementById("adminProdImage").value = "";
         } catch(e) { alert("Error adding product."); }
     });
 
-    // DELETE PRODUCT
     window.deleteProduct = async function(prodId) {
         if(confirm("Delete this product?")) await deleteDoc(doc(db, "products", prodId));
     };
 
-    // UPDATE PRODUCT STOCK INLINE
     window.updateStock = async function(prodId) {
         const newStockVal = document.getElementById(`stockInput-${prodId}`).value;
         try {
-            await updateDoc(doc(db, "products", prodId), {
-                stock: Number(newStockVal)
-            });
+            await updateDoc(doc(db, "products", prodId), { stock: Number(newStockVal) });
             alert("Stock updated successfully!");
-        } catch (error) {
-            console.error(error);
-            alert("Failed to update stock.");
-        }
+        } catch (error) { alert("Failed to update stock."); }
     };
 
     function loadProducts() {
         onSnapshot(collection(db, "products"), (snapshot) => {
             products = [];
             document.getElementById("productsTable").innerHTML = "";
-            
             snapshot.forEach(docSnap => {
                 const product = { id: docSnap.id, ...docSnap.data() };
                 products.push(product);
-                
                 document.getElementById("productsTable").innerHTML += `
                     <tr data-shop-id="${product.shopId}">
-                        <td>
-                            <img src="${product.image || 'https://placehold.co/60'}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;">
-                        </td>
+                        <td><img src="${product.image || 'https://placehold.co/60'}" style="width:40px; height:40px; border-radius:8px; object-fit:cover;"></td>
                         <td>${product.name}</td>
                         <td>${getShopName(product.shopId)}</td>
                         <td>₹${product.price}</td>
@@ -685,11 +699,7 @@
                                 <button class="btn success" style="padding: 6px 12px;" onclick="updateStock('${product.id}')">Save</button>
                             </div>
                         </td>
-                        <td>
-                            ${product.stock > 0 
-                                ? '<span class="badge accepted">Available</span>' 
-                                : '<span class="badge cancelled">Out of Stock</span>'}
-                        </td>
+                        <td>${product.stock > 0 ? '<span class="badge accepted">Available</span>' : '<span class="badge cancelled">Out of Stock</span>'}</td>
                         <td><button class="btn danger" onclick="deleteProduct('${product.id}')">Delete</button></td>
                     </tr>
                 `;
@@ -712,22 +722,15 @@
         return shop ? shop.name : "Unknown Shop";
     }
 
-    // FUNCTION TO FILTER PRODUCTS TABLE
     function filterProductsList() {
         const term = document.getElementById("searchProduct").value.toLowerCase().trim();
         const selectedShop = document.getElementById("productShopFilter").value;
-        
         document.querySelectorAll("#productsTable tr").forEach(row => {
-            const rowText = row.innerText.toLowerCase();
-            const rowShopId = row.getAttribute("data-shop-id");
-            
-            const matchesSearch = rowText.includes(term);
-            const matchesShop = (selectedShop === "all" || selectedShop === rowShopId);
-            
+            const matchesSearch = row.innerText.toLowerCase().includes(term);
+            const matchesShop = (selectedShop === "all" || selectedShop === row.getAttribute("data-shop-id"));
             row.style.display = (matchesSearch && matchesShop) ? "" : "none";
         });
     }
-
     document.getElementById("searchProductBtn").addEventListener("click", filterProductsList);
     document.getElementById("productShopFilter").addEventListener("change", filterProductsList);
     document.getElementById("searchProduct").addEventListener("input", filterProductsList);
@@ -745,18 +748,14 @@
             snapshot.forEach(docSnap => {
                 const order = { id: docSnap.id, ...docSnap.data() };
                 orders.push(order);
-                
                 const currentStatus = getOverallStatus(order);
                 if(currentStatus !== "delivered" && currentStatus !== "cancelled") pending++;
                 if(currentStatus === "delivered") revenue += calculateDynamicTotal(order);
             });
 
-            // CHRONOLOGICAL DESCENDING SORT
             orders.sort((a, b) => {
-                let rawA = a.time || a.timestamp || a.createdAt || 0;
-                let rawB = b.time || b.timestamp || b.createdAt || 0;
-                let timeA = isNaN(Number(rawA)) ? new Date(rawA).getTime() : Number(rawA);
-                let timeB = isNaN(Number(rawB)) ? new Date(rawB).getTime() : Number(rawB);
+                let timeA = isNaN(Number(a.time)) ? new Date(a.time).getTime() : Number(a.time);
+                let timeB = isNaN(Number(b.time)) ? new Date(b.time).getTime() : Number(b.time);
                 return (timeB || 0) - (timeA || 0);
             });
             
@@ -766,7 +765,6 @@
             document.getElementById("totalRevenue").innerHTML = "₹" + revenue;
 
             renderAllOrdersToTables();
-            updateCustomersTable();
             populateAssignmentDropdowns();
         });
     }
@@ -774,11 +772,9 @@
     function renderAllOrdersToTables() {
         document.getElementById("dashboardOrdersTable").innerHTML = "";
         const recentOrders = orders.slice(0, 10);
-        
         recentOrders.forEach(order => {
             const shopNames = [...new Set((order.items || []).map(item => getShopName(item.shopId)))];
             const currentStatus = getOverallStatus(order);
-
             document.getElementById("dashboardOrdersTable").innerHTML += `
                 <tr>
                     <td>${order.orderId || order.id.slice(0,6)}</td>
@@ -791,7 +787,6 @@
                 </tr>
             `;
         });
-
         applyFilters(); 
     }
 
@@ -806,17 +801,12 @@
     const searchInput = document.getElementById("searchOrder");
     const statusSelect = document.getElementById("statusFilter");
     const shopSelect = document.getElementById("shopFilter");
-    const filterBtn = document.getElementById("applyFilterBtn");
-
+    
     searchInput.addEventListener("input", applyFilters);
     statusSelect.addEventListener("change", applyFilters);
     shopSelect.addEventListener("change", applyFilters);
-    
-    filterBtn.addEventListener("click", () => {
-        searchInput.value = "";
-        statusSelect.value = "all";
-        shopSelect.value = "all";
-        applyFilters();
+    document.getElementById("applyFilterBtn").addEventListener("click", () => {
+        searchInput.value = ""; statusSelect.value = "all"; shopSelect.value = "all"; applyFilters();
     });
 
     function applyFilters() {
@@ -825,15 +815,12 @@
         const shop = shopSelect.value;
         
         document.getElementById("ordersTable").innerHTML = "";
-        
         orders.forEach(order => {
             const searchMatch = String(order.orderId || "").toLowerCase().includes(search) || 
                                 String(order.name || "").toLowerCase().includes(search) || 
                                 String(order.phone || "").toLowerCase().includes(search);
-                                
             const currentStatus = getOverallStatus(order);
             const statusMatch = status === "all" || currentStatus === status;
-            
             const shopMatch = shop === "all" || (order.items || []).some(item => String(item.shopId) === shop);
             
             if(searchMatch && statusMatch && shopMatch) {
@@ -865,38 +852,25 @@
             const shopStatus = (order.shopStatuses && order.shopStatuses[item.shopId]) ? order.shopStatuses[item.shopId] : 'pending';
             const isRejected = shopStatus === 'rejected';
             const isAccepted = shopStatus === 'accepted';
-            
             const textStyle = isRejected ? "text-decoration: line-through; color: #dc2626; opacity: 0.7;" : "";
             
-            let statusBadge = "";
-            if (isRejected) {
-                statusBadge = `<span class="badge cancelled" style="font-size:10px; padding:2px 6px; margin-left:8px;">Rejected by Shop</span>`;
-            } else if (isAccepted) {
-                statusBadge = `<span class="badge accepted" style="font-size:10px; padding:2px 6px; margin-left:8px;">Accepted by Shop</span>`;
-            }
+            let statusBadge = isRejected ? `<span class="badge cancelled" style="font-size:10px; padding:2px 6px; margin-left:8px;">Rejected by Shop</span>` : (isAccepted ? `<span class="badge accepted" style="font-size:10px; padding:2px 6px; margin-left:8px;">Accepted by Shop</span>` : "");
 
             html += `
                 <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; ${textStyle}">
-                    <div>
-                        <b>${item.name}</b> ${statusBadge}<br>
-                        <small>Shop : ${getShopName(item.shopId)}</small>
-                    </div>
+                    <div><b>${item.name}</b> ${statusBadge}<br><small>Shop : ${getShopName(item.shopId)}</small></div>
                     <div>${item.qty} × ₹${item.price}</div>
                 </div>
             `;
         });
-        
         document.getElementById("productsInOrder").innerHTML = html || "<p>No items found</p>";
         
         const currentOverallStatus = getOverallStatus(order);
-        let deleteActionBtnHtml = "";
-        if (currentOverallStatus === "cancelled") {
-            deleteActionBtnHtml = `
+        let deleteActionBtnHtml = currentOverallStatus === "cancelled" ? `
                 <button class="btn danger" style="width:100%; margin-top:12px; font-weight:bold;" onclick="window.deleteCancelledOrder('${order.id}')">
                     🗑 Permanent Purge From Database
                 </button>
-            `;
-        }
+            ` : "";
 
         document.getElementById("customerDetails").innerHTML = `
             <p><b>Name :</b> ${order.name || "N/A"}</p><br>
@@ -905,7 +879,6 @@
             <p><b>Delivery Charge :</b> ₹${order.deliveryCharge || 0}</p><br>
             <p><b>Total :</b> ₹${calculateDynamicTotal(order)}</p><br>
             <p><b>Payment :</b> Cash On Delivery</p><br>
-            
             <label style="font-weight:600;">Update Pipeline Status (Admin Override)</label>
             <select id="statusUpdateSelect" style="padding: 10px; border-radius: 6px; width:100%; margin-top:6px; border:1px solid #ccc;">
                 <option value="placed" ${currentOverallStatus === "placed" ? "selected" : ""}>Placed</option>
@@ -921,17 +894,12 @@
             <button class="btn primary" style="width:100%; margin-top:10px;" onclick="window.saveOrderStatus('${order.id}')">Apply Supreme Override</button>
             ${deleteActionBtnHtml}
         `;
-        
         document.getElementById("orderDetails").scrollIntoView({ behavior: 'smooth' });
     };
 
-    /* ==========================================
-       ADMIN SUPREMACY UPDATE (FIXED LOGIC)
-    ========================================== */
     window.saveOrderStatus = async function(orderId) {
         const selectEl = document.getElementById("statusUpdateSelect");
         if(!selectEl) return;
-        
         const newStatus = selectEl.value;
         const order = orders.find(o => o.id === orderId);
         
@@ -939,49 +907,31 @@
 
         try {
             const updatePayload = { status: newStatus };
-            
             if (order.items && order.items.length > 0) {
-                order.items.forEach(item => {
-                    if (item.shopId) {
-                        updatePayload[`shopStatuses.${item.shopId}`] = newStatus;
-                    }
-                });
+                order.items.forEach(item => { if (item.shopId) updatePayload[`shopStatuses.${item.shopId}`] = newStatus; });
             } else if (order.shopIds && order.shopIds.length > 0) {
-                order.shopIds.forEach(shopId => {
-                    updatePayload[`shopStatuses.${shopId}`] = newStatus;
-                });
+                order.shopIds.forEach(shopId => { updatePayload[`shopStatuses.${shopId}`] = newStatus; });
             }
-
-            if (newStatus === "cancelled") {
-                updatePayload.deliveryBoy = null;
-            }
+            if (newStatus === "cancelled") updatePayload.deliveryBoy = null;
 
             await updateDoc(doc(db, "orders", orderId), updatePayload);
             alert(`Supreme Override Applied: Order updated to '${newStatus}' across all platforms!`);
-            
-        } catch(e) {
-            console.error(e);
-            alert("Failed to execute supreme override document update.");
-        }
+        } catch(e) { alert("Failed to execute supreme override document update."); }
     };
 
     window.deleteCancelledOrder = async function(orderId) {
         if(!confirm("Are you sure you want to permanently delete this cancelled order record from Firestore?")) return;
         try {
             await deleteDoc(doc(db, "orders", orderId));
-            alert("Cancelled order record purged from system database successfully.");
+            alert("Cancelled order record purged.");
             document.getElementById("productsInOrder").innerHTML = "Select an order from the list above.";
             document.getElementById("customerDetails").innerHTML = "Select an order from the list above.";
-        } catch(error) {
-            console.error("Purge Error: ", error);
-            alert("Failed to delete record.");
-        }
+        } catch(error) { alert("Failed to delete record."); }
     };
 
     /* ==========================================
        DELIVERY PARTNERS PIPELINE
     ========================================== */
-    // CREATE DELIVERY PARTNER
     document.getElementById("createDeliveryBtn").addEventListener("click", async () => {
         const name = document.getElementById("newDeliveryName").value;
         const phone = document.getElementById("newDeliveryPhone").value;
@@ -989,20 +939,12 @@
         const pass = document.getElementById("newDeliveryPass").value;
 
         if(!name || !phone || !loginId || !pass) return alert("Please fill all details.");
-
         try {
-            await addDoc(collection(db, "delivery_partners"), {
-                name, phone, loginId, password: pass, status: "offline", currentOrderId: ""
-            });
+            await addDoc(collection(db, "delivery_partners"), { name, phone, loginId, password: pass, status: "offline", currentOrderId: "" });
             alert("Delivery Partner created!");
-            document.getElementById("newDeliveryName").value = "";
-            document.getElementById("newDeliveryPhone").value = "";
-            document.getElementById("newDeliveryLogin").value = "";
-            document.getElementById("newDeliveryPass").value = "";
-        } catch(e) { console.error(e); alert("Error creating partner."); }
+        } catch(e) { alert("Error creating partner."); }
     });
     
-    // DELETE DELIVERY PARTNER
     window.deleteDeliveryPartner = async function(partnerId) {
         if(confirm("Delete this delivery partner account?")) await deleteDoc(doc(db, "delivery_partners", partnerId));
     };
@@ -1011,11 +953,9 @@
         onSnapshot(collection(db, "delivery_partners"), (snapshot) => {
             deliveryPartners = [];
             document.getElementById("deliveryTable").innerHTML = "";
-            
             snapshot.forEach(docSnap => {
                 const partner = { id: docSnap.id, ...docSnap.data() };
                 deliveryPartners.push(partner);
-                
                 document.getElementById("deliveryTable").innerHTML += `
                     <tr>
                         <td>${partner.name || "-"}</td>
@@ -1034,7 +974,6 @@
     function populateAssignmentDropdowns() {
         const orderSelect = document.getElementById("assignOrderSelect");
         const partnerSelect = document.getElementById("assignPartnerSelect");
-        
         if(!orderSelect || !partnerSelect) return;
         
         orderSelect.innerHTML = '<option value="">Select Order</option>';
@@ -1055,56 +994,83 @@
         const orderId = document.getElementById("assignOrderSelect").value;
         const partnerId = document.getElementById("assignPartnerSelect").value;
         
-        if(!orderId || !partnerId) {
-            alert("Please pick both an order document and an online partner driver profile.");
-            return;
-        }
+        if(!orderId || !partnerId) return alert("Please pick both an order document and an online partner driver profile.");
         try {
             await updateDoc(doc(db, "orders", orderId), { deliveryPartnerId: partnerId, status: "preparing" });
             await updateDoc(doc(db, "delivery_partners", partnerId), { currentOrderId: orderId });
             alert("Delivery Partner assigned to active shipment processing successfully!");
-        } catch(e) {
-            console.error(e);
-            alert("Assignment sync write mismatch failure.");
-        }
+        } catch(e) { alert("Assignment sync write mismatch failure."); }
     });
 
     /* ==========================================
-       DYNAMIC CUSTOMER COMPUTED SPENDING LOGIC
+       USER REGISTRATIONS MANAGEMENT
     ========================================== */
-    function updateCustomersTable() {
-        const customerMap = {};
-        orders.forEach(order => {
-            const phoneKey = order.phone || "Unknown Phone";
-            if(!customerMap[phoneKey]) {
-                customerMap[phoneKey] = {
-                    name: order.name || "Guest Checkout",
-                    phone: phoneKey,
-                    totalOrders: 0,
-                    totalSpending: 0,
-                    lastOrder: order.time || 0
-                };
+    window.loadUsers = function() {
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            allRegisteredUsers = [];
+            
+            snapshot.forEach(docSnap => {
+                allRegisteredUsers.push({ id: docSnap.id, ...docSnap.data() });
+            });
+
+            // Sort by Created Date (Descending for Newest First)
+            allRegisteredUsers.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+            const allTable = document.getElementById("allUsersTable");
+            const newTable = document.getElementById("newUsersTable");
+            allTable.innerHTML = "";
+            newTable.innerHTML = "";
+
+            allRegisteredUsers.forEach((user) => {
+                let dateStr = user.createdAt ? new Date(user.createdAt).toLocaleDateString() + " " + new Date(user.createdAt).toLocaleTimeString() : "Unknown Date";
+                
+                // If the user has been manually acknowledged, put them in "All Users"
+                if (user.isAcknowledged) {
+                    allTable.innerHTML += `
+                        <tr>
+                            <td><b>${user.name || "N/A"}</b></td>
+                            <td>${user.phone || "N/A"}</td>
+                            <td><a href="mailto:${user.email || ''}" style="color:var(--primary);text-decoration:none;">${user.email || "N/A"}</a></td>
+                            <td>${user.address || "N/A"}</td>
+                            <td><span class="badge" style="background:#eef2ff;color:#4f46e5;">${dateStr}</span></td>
+                        </tr>
+                    `;
+                } else {
+                    // Otherwise, they stay in "New Users" and get the Action button
+                    newTable.innerHTML += `
+                        <tr>
+                            <td><b>${user.name || "N/A"}</b></td>
+                            <td>${user.phone || "N/A"}</td>
+                            <td><a href="mailto:${user.email || ''}" style="color:var(--primary);text-decoration:none;">${user.email || "N/A"}</a></td>
+                            <td>${user.address || "N/A"}</td>
+                            <td><span class="badge" style="background:#fff3cd;color:#946200;">${dateStr}</span></td>
+                            <td><button class="btn success" onclick="moveToAllUsers('${user.id}')">Move to All ➡</button></td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            if(allTable.innerHTML === "") {
+                allTable.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 20px; color: #888;">No users in this section yet</td></tr>`;
             }
-            customerMap[phoneKey].totalOrders++;
-            if(getOverallStatus(order) === "delivered") {
-                customerMap[phoneKey].totalSpending += calculateDynamicTotal(order);
+            if(newTable.innerHTML === "") {
+                newTable.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color: #888;">No new pending users to review</td></tr>`;
             }
         });
-        
-        document.getElementById("customersTable").innerHTML = "";
-        Object.values(customerMap).forEach(c => {
-            let dateStr = c.lastOrder ? new Date(c.lastOrder).toLocaleDateString() : "-";
-            document.getElementById("customersTable").innerHTML += `
-                <tr>
-                    <td>${c.name}</td>
-                    <td>${c.phone}</td>
-                    <td>${c.totalOrders}</td>
-                    <td><b>₹${c.totalSpending}</b></td>
-                    <td>${dateStr}</td>
-                </tr>
-            `;
-        });
-    }
+    };
+
+    window.moveToAllUsers = async function(userId) {
+        try {
+            // Update the user's document in Firestore to flag them as acknowledged
+            await updateDoc(doc(db, "users", userId), {
+                isAcknowledged: true
+            });
+            // The onSnapshot listener will immediately catch this change and visually move them to the "All Users" table!
+        } catch (error) {
+            console.error("Error moving user:", error);
+            alert("Failed to move user. Check your database connection.");
+        }
+    };
 
     /* ==========================================
        PLATFORM CONFIG SETTINGS CONTROLLER
@@ -1114,13 +1080,10 @@
         const name = document.getElementById("platformName").value;
         try {
             await updateDoc(doc(db, "settings", "platform"), {
-                defaultDeliveryCharge: Number(charge),
-                platformName: name
+                defaultDeliveryCharge: Number(charge), platformName: name
             });
             alert("Settings configurations saved successfully inside cloud bucket instance documents.");
-        } catch(e) {
-            alert("Configuration fallback applied locally for this workspace session panel.");
-        }
+        } catch(e) { alert("Configuration fallback applied locally for this workspace session panel."); }
     });
 
     /* ==========================================
@@ -1129,7 +1092,6 @@
     document.getElementById("refreshDashboardBtn").addEventListener("click", () => loadOrders());
     document.getElementById("refreshShopsBtn").addEventListener("click", () => loadShops());
     document.getElementById("refreshDeliveryBtn").addEventListener("click", () => loadDeliveryPartners());
-    document.getElementById("refreshCustomersBtn").addEventListener("click", () => updateCustomersTable());
     
 </script>
 </body>
