@@ -54,7 +54,7 @@ header { background: #27374D; color: white; text-align: center; padding: 18px; f
 .buttonRow { display: flex; gap: 15px; margin-top: 20px; }
 .acceptBtn { background: #4CAF50; padding: 12px 25px; border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: bold;}
 .rejectBtn { background: #f44336; padding: 12px 25px; border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: bold;}
-.timerText { color: #d97706; font-weight: bold; margin-top: 8px; }
+.timerText { color: #d97706; font-weight: bold; margin-top: 8px; font-size: 14px; }
 
 @media(max-width:800px){ .inventoryGrid { grid-template-columns: 1fr; } }
 </style>
@@ -120,7 +120,7 @@ header { background: #27374D; color: white; text-align: center; padding: 18px; f
     </div>
 
     <div class="section">
-        <h2>🟡 New Pending Orders</h2>
+        <h2>🟡 New Pending Orders (2-Minute Buffer)</h2>
         <div id="pendingContainer">
             <div style="text-align:center; padding:20px; color:#777;">No new orders right now.</div>
         </div>
@@ -217,7 +217,7 @@ function initializeShopDashboard() {
 
     startInventoryListener();
     listenToAllPlatformOrders();
-    setInterval(check5MinAutoReject, 10000); // Check auto-reject timer every 10 seconds
+    setInterval(check2MinAutoReject, 3000); // Enforce 2-minute auto-rejection buffer every 3 seconds
 }
 
 /* ==========================================
@@ -241,21 +241,21 @@ function playOrderAlertSound() {
 }
 
 /* ==========================================
-   AUTOMATIC 5-MINUTE REJECTION TIMER
+   AUTOMATIC 2-MINUTE REJECTION TIMER
 ========================================== */
-async function check5MinAutoReject() {
+async function check2MinAutoReject() {
     if (!MY_SHOP_ID) return;
     const now = Date.now();
-    const fiveMinutes = 5 * 60 * 1000;
+    const twoMinutes = 2 * 60 * 1000;
 
     for (const order of rawOrdersSnapshot) {
         if (!order.shopIds || !order.shopIds.includes(MY_SHOP_ID)) continue;
         const myStatus = (order.shopStatuses && order.shopStatuses[MY_SHOP_ID]) || "placed";
 
-        if (myStatus === "placed") {
+        if (myStatus === "placed" || myStatus === "pending") {
             const orderTime = order.time ? (typeof order.time === 'number' ? order.time : new Date(order.time).getTime()) : now;
-            if (now - orderTime >= fiveMinutes) {
-                // Auto Reject Order after 5 Minutes
+            if (now - orderTime >= twoMinutes) {
+                // Auto Reject Order after 2 minutes
                 try {
                     const payload = {};
                     payload[`shopStatuses.${MY_SHOP_ID}`] = "rejected";
@@ -430,7 +430,7 @@ function renderOrdersList(containerId, list, showActions) {
                 <div><b>Customer:</b> ${order.name || 'Guest'}</div>
                 <div class="itemBox"><ul>${itemsHTML}</ul></div>
                 ${showActions ? `
-                <div class="timerText">⏱ Auto-rejects if not accepted within 5 minutes</div>
+                <div class="timerText">⏱ Auto-rejects if not accepted within 2 minutes</div>
                 <div class="buttonRow">
                     <button class="acceptBtn" onclick="acceptOrder('${order.id}')">✅ Accept Order</button>
                     <button class="rejectBtn" onclick="rejectOrder('${order.id}')">❌ Reject Order</button>
@@ -458,7 +458,7 @@ window.rejectOrder = async function(orderDocId) {
     } catch(e) { alert("Failed to reject."); }
 };
 
-// Check for persistent login on initialization
+// Check session
 checkShopSession();
 </script>
 </body>

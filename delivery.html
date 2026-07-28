@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blinkit Delivery Panel (Batched)</title>
+    <title>Blinkit Delivery Panel (Batched Multi-Shop)</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background: #f4f6f9; }
@@ -56,7 +56,7 @@
         </div>
 
         <div class="card">
-            <div class="section-title">📦 Available Accepted Orders for Pickup</div>
+            <div class="section-title">📦 Available Accepted Orders for Pickup (Post 2-Min Buffer)</div>
             <div id="availableOrders">Loading...</div>
         </div>
 
@@ -191,6 +191,9 @@
             location.reload();
         });
 
+        /* =======================================================
+           LOAD AVAILABLE ORDERS (WITH 2-MINUTE SHOP BUFFER CHECK)
+        ======================================================= */
         function loadAvailableOrders() {
             if (!sessionDriverName) return;
             const list = document.getElementById("availableOrders");
@@ -203,12 +206,31 @@
                 let count = 0;
                 let soundTriggered = false;
 
+                const twoMinutesMs = 2 * 60 * 1000;
+                const now = Date.now();
+
                 snapshot.forEach(orderDoc => {
                     const order = orderDoc.data();
                     const id = orderDoc.id;
 
                     if (order.deliveryBoy || order.status === "delivered" || order.status === "cancelled") return;
 
+                    // Compute Order Time & Buffer status
+                    const orderTime = order.time ? (typeof order.time === 'number' ? order.time : new Date(order.time).getTime()) : now;
+                    const timeElapsed = now - orderTime;
+
+                    // Check if all shops have responded
+                    const allShopsResponded = order.shopIds && order.shopIds.length > 0 && order.shopIds.every(sId => {
+                        return order.shopStatuses && order.shopStatuses[sId] && order.shopStatuses[sId] !== 'placed' && order.shopStatuses[sId] !== 'pending';
+                    });
+
+                    // 2-MINUTE BUFFER RULE: Order goes to delivery panel ONLY AFTER 2 Minutes,
+                    // or if all shops manually responded before 2 minutes.
+                    const isBufferCleared = (timeElapsed >= twoMinutesMs) || allShopsResponded;
+
+                    if (!isBufferCleared) return;
+
+                    // Gather only shop items that were accepted
                     let acceptedItems = [];
                     if (order.shopStatuses) {
                         acceptedItems = (order.items || []).filter(item => order.shopStatuses[String(item.shopId)] === "accepted");
@@ -216,6 +238,7 @@
                         acceptedItems = order.items || [];
                     }
 
+                    // If all items were rejected, do not show in delivery panel
                     if (acceptedItems.length === 0) return;
 
                     if (!isInitialLoad && !knownAvailableOrders.has(id)) {
@@ -231,15 +254,15 @@
                     const div = document.createElement("div");
                     div.className = "order-card";
                     div.innerHTML = `
-                        <h3>${order.orderId || id.slice(0,8)}</h3>
-                        <span class="badge" style="background:#4caf50;">Shop Accepted - Ready for pickup</span><br><br>
+                        <h3>Order #${order.orderId || id.slice(0,8)}</h3>
+                        <span class="badge" style="background:#4caf50;">Ready for Pickup (Buffer Cleared)</span><br><br>
                         <b>Customer :</b> ${order.name || "N/A"}<br>
                         <b>Phone :</b> ${order.phone || "N/A"}<br>
                         <b>Address :</b> ${order.address || "N/A"}<br><br>
-                        <b>Items :</b><br>
+                        <b>Accepted Items to Pick Up :</b><br>
                         ${acceptedItems.map(i => `• ${i.name} × ${i.qty}`).join("<br>")}<br><br>
-                        <b style="color: #c62828;">Total To Collect: ₹${storeCost + deliveryCharge}</b><br><br>
-                        <button class="btn-green" id="accept-${id}">Accept Delivery</button>
+                        <b style="color: #c62828;">Total Cash To Collect: ₹${storeCost + deliveryCharge}</b><br><br>
+                        <button class="btn-green" id="accept-${id}">Accept Delivery Run</button>
                     `;
                     list.appendChild(div);
 
@@ -262,9 +285,12 @@
                 if (soundTriggered) playDeliveryAlert();
                 isInitialLoad = false;
 
-                if (count === 0) list.innerHTML = "<p>No Orders Ready For Pickup</p>";
+                if (count === 0) list.innerHTML = "<p>No Orders Ready For Pickup Right Now</p>";
             });
         }
+
+        // Periodically refresh available orders to move orders into delivery after 2-min timer expires
+        setInterval(loadAvailableOrders, 5000);
 
         function loadMyOrders() {
             if (!sessionDriverName) return;
@@ -287,7 +313,7 @@
                     const div = document.createElement("div");
                     div.className = "order-card";
                     div.innerHTML = `
-                        <h3>${order.orderId || id.slice(0,8)}</h3>
+                        <h3>Order #${order.orderId || id.slice(0,8)}</h3>
                         <b>Customer :</b> ${order.name}<br>
                         <b>Phone :</b> ${order.phone}<br>
                         <b>Address :</b> ${order.address}<br><br>
@@ -328,7 +354,7 @@
                     const div = document.createElement("div");
                     div.className = "order-card";
                     div.innerHTML = `
-                        <h3>${order.orderId || orderDoc.id.slice(0,8)}</h3>
+                        <h3>Order #${order.orderId || orderDoc.id.slice(0,8)}</h3>
                         👤 ${order.name}<br>
                         <span class="badge">Delivered</span>
                     `;
