@@ -1,182 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blinkit Delivery Panel (Batched)</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-
-        body {
-            background: #f4f6f9;
-        }
-
-        header {
-            background: #ff9800;
-            color: white;
-            padding: 18px;
-            font-size: 26px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .container {
-            width: 95%;
-            max-width: 1300px;
-            margin: 20px auto;
-        }
-
-        .card {
-            background: white;
-            padding: 18px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, .1);
-        }
-
-        .section-title {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .order-card {
-            background: #fafafa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 5px solid #ff9800;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            background: #2196f3;
-            color: white;
-            font-size: 13px;
-            margin-top: 8px;
-        }
-
-        button {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .btn-green {
-            background: #2e7d32;
-            color: white;
-        }
-
-        .btn-blue {
-            background: #1565c0;
-            color: white;
-        }
-
-        .btn-orange {
-            background: #ff9800;
-            color: white;
-            font-weight: bold;
-            width: 100%;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            margin-top: 10px;
-        }
-
-        #toast {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 20px;
-            border-radius: 8px;
-            color: white;
-            z-index: 9999;
-        }
-
-        .success {
-            background: #2e7d32;
-        }
-
-        .error {
-            background: #c62828;
-        }
-
-        /* Login Portal Layout Components */
-        .login-card {
-            max-width: 450px;
-            margin: 60px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-            font-size: 14px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 15px;
-        }
-
-        .profile-header-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f4f6f9; }
+        header { background: #ff9800; color: white; padding: 18px; font-size: 26px; font-weight: bold; text-align: center; }
+        .container { width: 95%; max-width: 1300px; margin: 20px auto; }
+        .card { background: white; padding: 18px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, .1); }
+        .section-title { font-size: 22px; font-weight: bold; margin-bottom: 15px; }
+        .order-card { background: #fafafa; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 5px solid #ff9800; }
+        .badge { display: inline-block; padding: 5px 12px; border-radius: 20px; background: #2196f3; color: white; font-size: 13px; margin-top: 8px; }
+        button { padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 10px; }
+        .btn-green { background: #2e7d32; color: white; }
+        .btn-blue { background: #1565c0; color: white; }
+        .btn-orange { background: #ff9800; color: white; font-weight: bold; width: 100%; }
+        select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 10px; }
+        #toast { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); padding: 12px 20px; border-radius: 8px; color: white; z-index: 9999; }
+        .success { background: #2e7d32; }
+        .error { background: #c62828; }
+        .login-card { max-width: 450px; margin: 60px auto; padding: 30px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; font-size: 14px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+        .profile-header-bar { display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
-
 <body>
 
-    <header>
-        🚚 Delivery Dashboard (Timer Enabled)
-    </header>
+    <header>🚚 Delivery Dashboard Panel</header>
 
     <div id="loginSection" class="container">
         <div class="login-card" style="text-align: center;">
             <div class="section-title">Delivery Partner Login</div>
-            
             <div class="form-group">
                 <label for="username">Username / Agent ID</label>
                 <input type="text" id="username" placeholder="Enter your registered username">
             </div>
-
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" placeholder="••••••••">
             </div>
-
             <button class="btn-orange" id="loginBtn">Secure Log In</button>
         </div>
     </div>
@@ -190,30 +56,18 @@
         </div>
 
         <div class="card">
-            <div class="section-title">
-                📦 Available Combined Orders (2 Min Shop Buffer)
-            </div>
-            <div id="availableOrders">
-                Loading...
-            </div>
+            <div class="section-title">📦 Available Accepted Orders for Pickup</div>
+            <div id="availableOrders">Loading...</div>
         </div>
 
         <div class="card">
-            <div class="section-title">
-                🚚 My Active Deliveries
-            </div>
-            <div id="myOrders">
-                Loading...
-            </div>
+            <div class="section-title">🚚 My Active Deliveries</div>
+            <div id="myOrders">Loading...</div>
         </div>
 
         <div class="card">
-            <div class="section-title">
-                📜 Delivery History
-            </div>
-            <div id="historyOrders">
-                Loading...
-            </div>
+            <div class="section-title">📜 Delivery History</div>
+            <div id="historyOrders">Loading...</div>
         </div>
     </div>
 
@@ -222,14 +76,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import {
-            getFirestore,
-            collection,
-            query,
-            where,
-            onSnapshot,
-            doc,
-            updateDoc,
-            getDocs
+            getFirestore, collection, query, where, onSnapshot, doc, updateDoc, getDocs
         } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -245,11 +92,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // 2 Minutes Shop Response Window (120,000ms)
-        const SHOP_BUFFER_TIME = 2 * 60 * 1000; 
-
-        // Authenticated Session State Tracker
         let sessionDriverName = "";
+        let knownAvailableOrders = new Set();
+        let isInitialLoad = true;
 
         function showToast(message, type = "success") {
             const toast = document.getElementById("toast");
@@ -257,21 +102,43 @@
             toast.className = type;
             toast.style.display = "block";
             clearTimeout(toast.timer);
-            toast.timer = setTimeout(() => {
-                toast.style.display = "none";
-            }, 3000);
+            toast.timer = setTimeout(() => { toast.style.display = "none"; }, 3000);
         }
 
-        function currentBoy() {
-            return sessionDriverName;
+        function playDeliveryAlert() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.5);
+            } catch (e) {}
         }
 
-        // ========================================================
-        // COMPREHENSIVE AUTOMATIC LOGIN RESOLVER (AUTO-MATCH FIELDS)
-        // ========================================================
+        /* PERSISTENT LOGIN CHECK */
+        function checkDeliverySession() {
+            const savedSession = localStorage.getItem("deliverySession");
+            if (savedSession) {
+                sessionDriverName = savedSession;
+                document.getElementById("activeAgentName").innerText = sessionDriverName;
+                document.getElementById("loginSection").style.display = "none";
+                document.getElementById("dashboardSection").style.display = "block";
+                loadAvailableOrders();
+                loadMyOrders();
+                loadHistory();
+            }
+        }
+
         document.getElementById("loginBtn").addEventListener("click", async () => {
             const userVal = document.getElementById("username").value.trim();
-            const passVal = document.getElementById("password").value.trim();
+            const passVal = document.getElementById("passwordInput") ? document.getElementById("passwordInput").value.trim() : document.getElementById("password").value.trim();
 
             if (!userVal || !passVal) {
                 showToast("Please enter both Username and Password.", "error");
@@ -280,30 +147,21 @@
 
             try {
                 let matchedAccount = null;
-                
-                // Fallback matrix scanning combinations used by different admin panel setups
                 const collectionsToScan = ["delivery_boys", "delivery_partners", "delivery"];
                 const identifierFields = ["loginId", "username", "loginID"];
                 const passwordFields = ["password", "pass"];
 
-                // Dynamic deep scan loop to authenticate regardless of database property name setup
                 for (const collName of collectionsToScan) {
                     for (const idField of identifierFields) {
                         for (const passField of passwordFields) {
                             try {
-                                const authQuery = query(
-                                    collection(db, collName),
-                                    where(idField, "==", userVal),
-                                    where(passField, "==", passVal)
-                                );
+                                const authQuery = query(collection(db, collName), where(idField, "==", userVal), where(passField, "==", passVal));
                                 const snapshot = await getDocs(authQuery);
                                 if (!snapshot.empty) {
                                     matchedAccount = snapshot.docs[0].data();
                                     break;
                                 }
-                            } catch (e) {
-                                // Ignore non-existent collections or dynamic path execution errors
-                            }
+                            } catch (e) {}
                         }
                         if (matchedAccount) break;
                     }
@@ -311,171 +169,110 @@
                 }
 
                 if (matchedAccount) {
-                    // Extract exact dispatcher display name
                     sessionDriverName = matchedAccount.name || matchedAccount.Name || userVal;
+                    localStorage.setItem("deliverySession", sessionDriverName);
 
-                    // Swap view screens
                     document.getElementById("activeAgentName").innerText = sessionDriverName;
                     document.getElementById("loginSection").style.display = "none";
                     document.getElementById("dashboardSection").style.display = "block";
-                    
                     showToast("Logged in successfully!");
 
-                    // Initialize stream listeners
                     loadAvailableOrders();
                     loadMyOrders();
                     loadHistory();
                 } else {
                     showToast("Invalid credentials. Access Denied.", "error");
                 }
-            } catch (error) {
-                console.error("Auth System Error: ", error);
-                showToast("Database connectivity failure.", "error");
-            }
+            } catch (error) { showToast("Database connectivity failure.", "error"); }
         });
 
         document.getElementById("logoutBtn").addEventListener("click", () => {
-            sessionDriverName = "";
-            document.getElementById("username").value = "";
-            document.getElementById("password").value = "";
-            document.getElementById("dashboardSection").style.display = "none";
-            document.getElementById("loginSection").style.display = "block";
-            showToast("Logged out safely.");
+            localStorage.removeItem("deliverySession");
+            location.reload();
         });
 
-        // ======================================
-        // AVAILABLE ORDERS WITH 2-MINUTE BUFFER
-        // ======================================
         function loadAvailableOrders() {
             if (!sessionDriverName) return;
             const list = document.getElementById("availableOrders");
-            list.innerHTML = "Loading...";
             
-            const q = query(
-                collection(db, "orders"),
-                where("status", "==", "placed")
-            );
+            const q = query(collection(db, "orders"));
 
             onSnapshot(q, (snapshot) => {
                 if (!sessionDriverName) return;
                 list.innerHTML = "";
-                if (snapshot.empty) {
-                    list.innerHTML = "<p>No Available Orders</p>";
-                    return;
-                }
-
-                let visibleOrdersCount = 0;
-                const now = Date.now();
+                let count = 0;
+                let soundTriggered = false;
 
                 snapshot.forEach(orderDoc => {
                     const order = orderDoc.data();
                     const id = orderDoc.id;
-                    
-                    if (order.deliveryBoy) return;
 
-                    let orderTime = now;
-                    if (order.time) {
-                        orderTime = (typeof order.time.toDate === 'function') 
-                            ? order.time.toDate().getTime() 
-                            : new Date(order.time).getTime();
-                    }
-
-                    const timeElapsed = now - orderTime;
-                    if (timeElapsed < SHOP_BUFFER_TIME) {
-                        return;
-                    }
+                    if (order.deliveryBoy || order.status === "delivered" || order.status === "cancelled") return;
 
                     let acceptedItems = [];
-                    let ignoredItems = [];
-
-                    if (order.items && order.shopStatuses) {
-                        order.items.forEach(item => {
-                            const currentStatus = order.shopStatuses[String(item.shopId)];
-                            if (currentStatus === "accepted") {
-                                acceptedItems.push(item);
-                            } else {
-                                ignoredItems.push(item);
-                            }
-                        });
-
-                        if (acceptedItems.length === 0) return;
-                    } else {
+                    if (order.shopStatuses) {
+                        acceptedItems = (order.items || []).filter(item => order.shopStatuses[String(item.shopId)] === "accepted");
+                    } else if (order.status === "accepted") {
                         acceptedItems = order.items || [];
                     }
 
-                    visibleOrdersCount++;
-                    
-                    const acceptedHtml = acceptedItems
-                        .map(item => `<b style="color: #2e7d32;">[Accepted]</b> ${item.shop ? `[${item.shop}] ` : ''}${item.name} × ${item.qty}`)
-                        .join("<br>");
+                    if (acceptedItems.length === 0) return;
 
-                    const missedHtml = ignoredItems.length > 0 
-                        ? "<br><i style='color: #c62828;'>Dropped (Store skipped response window):</i><br>" + 
-                          ignoredItems.map(item => `[${item.shop || 'Shop'}] ${item.name} × ${item.qty}`).join("<br>")
-                        : "";
+                    if (!isInitialLoad && !knownAvailableOrders.has(id)) {
+                        soundTriggered = true;
+                    }
+                    knownAvailableOrders.add(id);
+                    count++;
 
-                    let calculatedStoreCost = 0;
-                    acceptedItems.forEach(item => {
-                        const price = Number(item.price) || 0;
-                        const qty = Number(item.qty) || 1;
-                        calculatedStoreCost += (price * qty);
-                    });
-
+                    let storeCost = 0;
+                    acceptedItems.forEach(item => { storeCost += (Number(item.price) || 0) * (Number(item.qty) || 1); });
                     const deliveryCharge = Number(order.deliveryCharge) || 0;
-                    const dynamicTotalAmount = calculatedStoreCost + deliveryCharge;
 
                     const div = document.createElement("div");
                     div.className = "order-card";
                     div.innerHTML = `
                         <h3>${order.orderId || id.slice(0,8)}</h3>
-                        <span class="badge" style="background:#4caf50;">Buffer Finished - Dispatched</span><br><br>
+                        <span class="badge" style="background:#4caf50;">Shop Accepted - Ready for pickup</span><br><br>
                         <b>Customer :</b> ${order.name || "N/A"}<br>
                         <b>Phone :</b> ${order.phone || "N/A"}<br>
                         <b>Address :</b> ${order.address || "N/A"}<br><br>
-                        ${acceptedHtml}
-                        ${missedHtml}<br><br>
-                        <b>Store Items Cost :</b> ₹${calculatedStoreCost}<br>
-                        <b>Delivery Earning :</b> ₹${deliveryCharge}<br>
-                        <b style="color: #c62828;">Total Cash To Collect : ₹${dynamicTotalAmount}</b><br><br>
-                        <button class="btn-green" id="accept-${id}">Accept Combined Delivery</button>
+                        <b>Items :</b><br>
+                        ${acceptedItems.map(i => `• ${i.name} × ${i.qty}`).join("<br>")}<br><br>
+                        <b style="color: #c62828;">Total To Collect: ₹${storeCost + deliveryCharge}</b><br><br>
+                        <button class="btn-green" id="accept-${id}">Accept Delivery</button>
                     `;
                     list.appendChild(div);
 
-                    document.getElementById(`accept-${id}`).addEventListener("click", async () => {
-                        try {
-                            await updateDoc(doc(db, "orders", id), {
-                                status: "delivery_accepted",
-                                deliveryBoy: currentBoy()
-                            });
-                            showToast("Delivery run assigned to your terminal!");
-                        } catch (e) {
-                            console.error(e);
-                            showToast("Assignment failed", "error");
+                    setTimeout(() => {
+                        const btn = document.getElementById(`accept-${id}`);
+                        if (btn) {
+                            btn.onclick = async () => {
+                                try {
+                                    await updateDoc(doc(db, "orders", id), {
+                                        status: "delivery_accepted",
+                                        deliveryBoy: sessionDriverName
+                                    });
+                                    showToast("Delivery run assigned to you!");
+                                } catch (e) { showToast("Assignment failed", "error"); }
+                            };
                         }
-                    });
+                    }, 0);
                 });
 
-                if (visibleOrdersCount === 0) {
-                    list.innerHTML = "<p>No Orders Ready (Shops are processing active countdowns...)</p>";
-                }
+                if (soundTriggered) playDeliveryAlert();
+                isInitialLoad = false;
+
+                if (count === 0) list.innerHTML = "<p>No Orders Ready For Pickup</p>";
             });
         }
 
-        // ======================================
-        // MY ACTIVE DELIVERIES
-        // ======================================
         function loadMyOrders() {
             if (!sessionDriverName) return;
             const list = document.getElementById("myOrders");
-            list.innerHTML = "Loading...";
 
-            const q = query(
-                collection(db, "orders"),
-                where("deliveryBoy", "==", currentBoy())
-            );
+            const q = query(collection(db, "orders"), where("deliveryBoy", "==", sessionDriverName));
 
             onSnapshot(q, (snapshot) => {
-                if (!sessionDriverName) return;
                 list.innerHTML = "";
                 if (snapshot.empty) {
                     list.innerHTML = "<p>No Active Deliveries</p>";
@@ -485,133 +282,54 @@
                 snapshot.forEach(orderDoc => {
                     const order = orderDoc.data();
                     const id = orderDoc.id;
-
-                    if (order.status === "delivered" || order.status === "cancelled") {
-                        return;
-                    }
-
-                    let activeItems = order.items || [];
-                    if (order.shopStatuses) {
-                        activeItems = activeItems.filter(item => order.shopStatuses[String(item.shopId)] === "accepted");
-                    }
-
-                    const items = activeItems.map(i => `${i.shop ? `[${i.shop}] ` : ''}${i.name} × ${i.qty}`).join("<br>");
-                    
-                    let calculatedStoreCost = 0;
-                    activeItems.forEach(item => {
-                        const price = Number(item.price) || 0;
-                        const qty = Number(item.qty) || 1;
-                        calculatedStoreCost += (price * qty);
-                    });
-
-                    const deliveryCharge = Number(order.deliveryCharge) || 0;
-                    const dynamicTotalAmount = calculatedStoreCost + deliveryCharge;
-
-                    let options = "";
-                    switch (order.status) {
-                        case "delivery_accepted":
-                        case "accepted":
-                            options = `
-                                <option value="delivery_accepted" selected>Accepted</option>
-                                <option value="picked_up">Picked Up</option>
-                            `;
-                            break;
-                        case "picked_up":
-                            options = `
-                                <option value="picked_up" selected>Picked Up</option>
-                                <option value="out for delivery">Out For Delivery</option>
-                            `;
-                            break;
-                        case "out for delivery":
-                            options = `
-                                <option value="out for delivery" selected>Out For Delivery</option>
-                                <option value="delivered">Delivered</option>
-                            `;
-                            break;
-                        default:
-                            options = `<option value="${order.status}" selected>${order.status}</option>`;
-                    }
+                    if (order.status === "delivered" || order.status === "cancelled") return;
 
                     const div = document.createElement("div");
                     div.className = "order-card";
                     div.innerHTML = `
                         <h3>${order.orderId || id.slice(0,8)}</h3>
-                        <br>
                         <b>Customer :</b> ${order.name}<br>
                         <b>Phone :</b> ${order.phone}<br>
                         <b>Address :</b> ${order.address}<br><br>
-                        ${items}<br><br>
-                        <b>Store Cost :</b> ₹${calculatedStoreCost}<br>
-                        <b>Delivery Cost :</b> ₹${deliveryCharge}<br>
-                        <b style="color: #c62828;">Total To Collect: ₹${dynamicTotalAmount}</b><br><br>
                         <select id="status-${id}">
-                            ${options}
+                            <option value="delivery_accepted" ${order.status === 'delivery_accepted' ? 'selected':''}>Accepted</option>
+                            <option value="picked_up" ${order.status === 'picked_up' ? 'selected':''}>Picked Up</option>
+                            <option value="out_for_delivery" ${order.status === 'out_for_delivery' ? 'selected':''}>Out For Delivery</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected':''}>Delivered</option>
                         </select>
-                        <br><br>
                         <button class="btn-blue" id="update-${id}">Update Status</button>
                     `;
                     list.appendChild(div);
 
-                    document.getElementById(`update-${id}`).addEventListener("click", async () => {
-                        const status = document.getElementById(`status-${id}`).value;
-                        try {
-                            await updateDoc(doc(db, "orders", id), {
-                                status: status
-                            });
-                            showToast("Status Updated");
-                        } catch (e) {
-                            console.error(e);
-                            showToast("Failed", "error");
+                    setTimeout(() => {
+                        const btn = document.getElementById(`update-${id}`);
+                        if (btn) {
+                            btn.onclick = async () => {
+                                const newStatus = document.getElementById(`status-${id}`).value;
+                                await updateDoc(doc(db, "orders", id), { status: newStatus });
+                                showToast("Status updated successfully!");
+                            };
                         }
-                    });
+                    }, 0);
                 });
             });
         }
 
-        // ======================================
-        // DELIVERY HISTORY
-        // ======================================
         function loadHistory() {
             if (!sessionDriverName) return;
             const list = document.getElementById("historyOrders");
-            list.innerHTML = "Loading...";
-
-            const q = query(
-                collection(db, "orders"),
-                where("deliveryBoy", "==", currentBoy())
-            );
+            const q = query(collection(db, "orders"), where("deliveryBoy", "==", sessionDriverName));
 
             onSnapshot(q, (snapshot) => {
-                if (!sessionDriverName) return;
                 list.innerHTML = "";
                 snapshot.forEach(orderDoc => {
                     const order = orderDoc.data();
                     if (order.status !== "delivered") return;
-
-                    let deliveredItems = order.items || [];
-                    if (order.shopStatuses) {
-                        deliveredItems = deliveredItems.filter(item => order.shopStatuses[String(item.shopId)] === "accepted");
-                    }
-                    
-                    let calculatedStoreCost = 0;
-                    deliveredItems.forEach(item => {
-                        const price = Number(item.price) || 0;
-                        const qty = Number(item.qty) || 1;
-                        calculatedStoreCost += (price * qty);
-                    });
-
-                    const deliveryCharge = Number(order.deliveryCharge) || 0;
-                    const dynamicTotalAmount = calculatedStoreCost + deliveryCharge;
-
                     const div = document.createElement("div");
                     div.className = "order-card";
                     div.innerHTML = `
                         <h3>${order.orderId || orderDoc.id.slice(0,8)}</h3>
-                        <br>
-                        👤 ${order.name}<br><br>
-                        <b>Items Charge Collected :</b> ₹${calculatedStoreCost}<br>
-                        <b>Delivery Commission Earned :</b> ₹${deliveryCharge}<br>
-                        <b>Total Amount Handled :</b> ₹${dynamicTotalAmount}<br><br>
+                        👤 ${order.name}<br>
                         <span class="badge">Delivered</span>
                     `;
                     list.appendChild(div);
@@ -619,12 +337,8 @@
             });
         }
 
-        setInterval(() => {
-            if (sessionDriverName) {
-                loadAvailableOrders();
-            }
-        }, 10000);
+        // Initialize persistent login check
+        checkDeliverySession();
     </script>
 </body>
-
 </html>
