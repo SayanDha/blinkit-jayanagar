@@ -56,6 +56,21 @@ header { background: #27374D; color: white; text-align: center; padding: 18px; f
 .rejectBtn { background: #f44336; padding: 12px 25px; border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: bold;}
 .timerText { color: #d97706; font-weight: bold; margin-top: 8px; font-size: 14px; }
 
+/* DELIVERY ASSIGNED BANNER FOR SHOP CONFIRMATION */
+.deliveryAssignedBox {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: #e0f2fe;
+    border: 1px solid #0284c7;
+    border-radius: 8px;
+    color: #0369a1;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.deliveryAssignedBox strong { color: #0c4a6e; font-size: 16px; }
+
 @media(max-width:800px){ .inventoryGrid { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -96,7 +111,7 @@ header { background: #27374D; color: white; text-align: center; padding: 18px; f
                 <input type="text" id="prodName" placeholder="Product Name (e.g. Apple)">
                 <input type="number" id="prodPrice" placeholder="Selling Price (₹)">
                 <input type="number" id="prodStock" placeholder="Initial Stock Quantity">
-                <input type="text" id="prodImage" placeholder="Image URL (Optional)">
+                <input type="file" id="prodImageFile" accept="image/*" style="background: white;">
                 <button id="addProductBtn">➕ Add Product to Store</button>
             </div>
 
@@ -120,7 +135,7 @@ header { background: #27374D; color: white; text-align: center; padding: 18px; f
     </div>
 
     <div class="section">
-        <h2>🟡 New Pending Orders (2-Minute Buffer)</h2>
+        <h2>🟡 New Pending Orders (5-Minute Buffer)</h2>
         <div id="pendingContainer">
             <div style="text-align:center; padding:20px; color:#777;">No new orders right now.</div>
         </div>
@@ -217,7 +232,7 @@ function initializeShopDashboard() {
 
     startInventoryListener();
     listenToAllPlatformOrders();
-    setInterval(check2MinAutoReject, 3000); // Enforce 2-minute auto-rejection buffer every 3 seconds
+    setInterval(check5MinAutoReject, 3000);
 }
 
 /* ==========================================
@@ -241,12 +256,12 @@ function playOrderAlertSound() {
 }
 
 /* ==========================================
-   AUTOMATIC 2-MINUTE REJECTION TIMER
+   AUTOMATIC 5-MINUTE REJECTION TIMER
 ========================================== */
-async function check2MinAutoReject() {
+async function check5MinAutoReject() {
     if (!MY_SHOP_ID) return;
     const now = Date.now();
-    const twoMinutes = 2 * 60 * 1000;
+    const fiveMinutes = 5 * 60 * 1000;
 
     for (const order of rawOrdersSnapshot) {
         if (!order.shopIds || !order.shopIds.includes(MY_SHOP_ID)) continue;
@@ -254,8 +269,7 @@ async function check2MinAutoReject() {
 
         if (myStatus === "placed" || myStatus === "pending") {
             const orderTime = order.time ? (typeof order.time === 'number' ? order.time : new Date(order.time).getTime()) : now;
-            if (now - orderTime >= twoMinutes) {
-                // Auto Reject Order after 2 minutes
+            if (now - orderTime >= fiveMinutes) {
                 try {
                     const payload = {};
                     payload[`shopStatuses.${MY_SHOP_ID}`] = "rejected";
@@ -314,19 +328,33 @@ document.getElementById("addProductBtn").addEventListener("click", async () => {
     const name = document.getElementById("prodName").value;
     const price = Number(document.getElementById("prodPrice").value);
     const stock = Number(document.getElementById("prodStock").value);
-    const image = document.getElementById("prodImage").value || "https://placehold.co/100";
+    const fileInput = document.getElementById("prodImageFile");
 
     if(!name || !price || isNaN(stock)) return alert("Please fill all product fields correctly.");
 
-    try {
-        await addDoc(collection(db, "products"), {
-            name: name, price: price, stock: stock, image: image, shopId: MY_SHOP_ID
+    function saveProduct(imageSrc) {
+        addDoc(collection(db, "products"), {
+            name: name, price: price, stock: stock, image: imageSrc, shopId: MY_SHOP_ID
+        }).then(() => {
+            alert("Product Added Successfully!");
+            document.getElementById("prodName").value = "";
+            document.getElementById("prodPrice").value = "";
+            document.getElementById("prodStock").value = "";
+            fileInput.value = "";
+        }).catch(() => {
+            alert("Failed to add product.");
         });
-        alert("Product Added Successfully!");
-        document.getElementById("prodName").value = "";
-        document.getElementById("prodPrice").value = "";
-        document.getElementById("prodStock").value = "";
-    } catch(e) { alert("Failed to add product."); }
+    }
+
+    if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            saveProduct(e.target.result);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+    } else {
+        saveProduct("https://placehold.co/100");
+    }
 });
 
 window.updateStock = async function(productId, change) {
@@ -421,16 +449,29 @@ function renderOrdersList(containerId, list, showActions) {
     list.forEach(order => {
         let itemsHTML = order.shopItems.map(i => `<li>${i.name} × ${i.qty}</li>`).join("");
         
+        // CONFIRMATION OF ASSIGNED DELIVERY PARTNER WHO WILL ACCEPT/PICKUP
+        const deliveryBoyName = order.deliveryBoy || order.deliveryPartnerName || order.driverName || null;
+        const deliveryPartnerBanner = deliveryBoyName ? `
+            <div class="deliveryAssignedBox">
+                🚚 <span>Assigned Delivery Partner: <strong>${deliveryBoyName}</strong></span>
+            </div>
+        ` : `
+            <div class="deliveryAssignedBox" style="background:#fef3c7; border-color:#f59e0b; color:#b45309;">
+                ⏳ <span>Awaiting Delivery Partner Acceptance / Assignment...</span>
+            </div>
+        `;
+        
         container.innerHTML += `
             <div class="orderCard">
                 <div class="top">
-                    <div class="orderId">${order.orderId || order.id.slice(0,6)}</div>
+                    <div class="orderId">Order #${order.orderId || order.id.slice(0,6)}</div>
                     <div class="${showActions ? 'statusPlaced' : 'statusAccepted'}">${showActions ? 'PENDING' : 'ACCEPTED'}</div>
                 </div>
                 <div><b>Customer:</b> ${order.name || 'Guest'}</div>
                 <div class="itemBox"><ul>${itemsHTML}</ul></div>
+                ${!showActions ? deliveryPartnerBanner : ''}
                 ${showActions ? `
-                <div class="timerText">⏱ Auto-rejects if not accepted within 2 minutes</div>
+                <div class="timerText">⏱ Auto-rejects if not accepted within 5 minutes</div>
                 <div class="buttonRow">
                     <button class="acceptBtn" onclick="acceptOrder('${order.id}')">✅ Accept Order</button>
                     <button class="rejectBtn" onclick="rejectOrder('${order.id}')">❌ Reject Order</button>
@@ -458,7 +499,6 @@ window.rejectOrder = async function(orderDocId) {
     } catch(e) { alert("Failed to reject."); }
 };
 
-// Check session
 checkShopSession();
 </script>
 </body>

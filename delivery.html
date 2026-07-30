@@ -56,7 +56,7 @@
         </div>
 
         <div class="card">
-            <div class="section-title">📦 Available Accepted Orders for Pickup (Post 2-Min Buffer)</div>
+            <div class="section-title">📦 Available Accepted Orders for Pickup (Post 5-Min Buffer)</div>
             <div id="availableOrders">Loading...</div>
         </div>
 
@@ -192,7 +192,7 @@
         });
 
         /* =======================================================
-           LOAD AVAILABLE ORDERS (WITH 2-MINUTE SHOP BUFFER CHECK)
+           LOAD AVAILABLE ORDERS (WITH 5-MINUTE SHOP BUFFER CHECK)
         ======================================================= */
         function loadAvailableOrders() {
             if (!sessionDriverName) return;
@@ -206,7 +206,7 @@
                 let count = 0;
                 let soundTriggered = false;
 
-                const twoMinutesMs = 2 * 60 * 1000;
+                const fiveMinutesMs = 5 * 60 * 1000;
                 const now = Date.now();
 
                 snapshot.forEach(orderDoc => {
@@ -224,9 +224,9 @@
                         return order.shopStatuses && order.shopStatuses[sId] && order.shopStatuses[sId] !== 'placed' && order.shopStatuses[sId] !== 'pending';
                     });
 
-                    // 2-MINUTE BUFFER RULE: Order goes to delivery panel ONLY AFTER 2 Minutes,
-                    // or if all shops manually responded before 2 minutes.
-                    const isBufferCleared = (timeElapsed >= twoMinutesMs) || allShopsResponded;
+                    // 5-MINUTE BUFFER RULE: Order goes to delivery panel ONLY AFTER 5 Minutes,
+                    // or if all shops manually responded before 5 minutes.
+                    const isBufferCleared = (timeElapsed >= fiveMinutesMs) || allShopsResponded;
 
                     if (!isBufferCleared) return;
 
@@ -289,7 +289,7 @@
             });
         }
 
-        // Periodically refresh available orders to move orders into delivery after 2-min timer expires
+        // Periodically refresh available orders to move orders into delivery after 5-min timer expires
         setInterval(loadAvailableOrders, 5000);
 
         function loadMyOrders() {
